@@ -218,7 +218,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     default:
         if (record->event.pressed) {
             #ifdef RGB_MATRIX_ENABLE
-                rgb_matrix_enable();
+                rgb_matrix_enable_noeeprom();
             #endif
             #ifdef IDLE_TIMEOUT_ENABLE
                 timeout_reset_timer();  //reset activity timer
