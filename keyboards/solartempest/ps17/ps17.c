@@ -17,7 +17,6 @@
  */
 
 #include "ps17.h"
-
 bool encoder_update_user(uint8_t index, bool clockwise) { // QMK encoder functionality
   #ifdef VIA_ENABLE //Add in VIA setting of rotary encoder keymap
 	    if (index == 0) { // First encoder
@@ -30,11 +29,6 @@ bool encoder_update_user(uint8_t index, bool clockwise) { // QMK encoder functio
 				action_exec((keyevent_t){.key = (keypos_t){.row = 0, .col = 2}, .pressed = false, .time = (timer_read() | 1)  });
 				}
 		}
-		/*if (clockwise) { //This code only works for single keypresses with the rotary encoder
-		  tap_code(dynamic_keymap_get_keycode(biton32(layer_state), 0, 0)); //Allow setting of keymap in VIA
-		} else {
-		  tap_code(dynamic_keymap_get_keycode(biton32(layer_state), 0, 2)); //Allow setting of keymap in VIA
-		}*/
   #endif
   return true;
 }

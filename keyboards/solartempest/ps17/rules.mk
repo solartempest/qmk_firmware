@@ -21,5 +21,3 @@ ENCODER_ENABLE = yes       # For encoder
 LTO_ENABLE = yes           # Reduce firmware size
 COMBO_ENABLE = yes         # Combos
 TAP_DANCE_ENABLE = no      # Tap dance
-
-IDLE_TIMEOUT_ENABLE = yes  # Turn LEDs off after inactive time

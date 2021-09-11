@@ -22,6 +22,10 @@
 	extern rgblight_config_t rgblight_config; // To pull layer status for RGBLIGHT
 #endif
 
+static uint16_t last_rgb; //For RGB Fade effect
+static uint8_t rgb_state[RGBLED_NUM];
+#define RGB_SUSTAIN 0.8 //default 0.7
+#define RGB_HIT 0x99
 
 bool is_alt_tab_active = false; // Super Alt Tab Code
 uint16_t alt_tab_timer = 0;
@@ -184,6 +188,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 
 void matrix_init_user(void) { //run when matrix is initiated, before all features init
+    //For RGB fade effect
+	last_rgb = timer_read();
+    rgblight_setrgb(0, 0, 0);
+    for (int i = 0; i < RGBLED_NUM; i++) {
+        rgb_state[i] = 0;
+    }
+	//End RGB fade effect
 };
 
 
@@ -200,9 +211,41 @@ void matrix_scan_user(void) { //run whenever user matrix is scanned
     //tap_code(KC_DOWN);
     tap_code(KC_F24);
   }
+  
+  #ifdef RGBLIGHT_ENABLE
+    // Animate the ripple effect at 50Hz (20ms interval):
+    if (timer_elapsed(last_rgb) > 20) {
+        last_rgb = timer_read();
+		
+        uint8_t next_rgb_state[RGBLED_NUM];
+        for (int i = 0; i < RGBLED_NUM; i++) {
+            // Retain some:
+            next_rgb_state[i] = rgb_state[i] * RGB_SUSTAIN;
+        }
+        // Assign the new state:
+        for (int i = 0; i < RGBLED_NUM; i++) {
+            rgb_state[i] = next_rgb_state[i];
+            led[i].b = rgb_state[i];
+        }
+        rgblight_set();
+    }
+    #endif //RGBLIGHT_ENABLE
+  
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+/*	#ifdef RGBLIGHT_ENABLE //For RGB fade
+		if (record->event.pressed) {
+			// Bump the level of the LED that corresponds to this key.
+			keypos_t key = record->event.key;
+
+			int i = 0;
+			i=26;
+			rgb_state[i] = RGB_HIT;
+		}
+    #endif*/
+	
+	
 	switch (keycode) { //For keycode overrides
 		case ATABF:	//Alt tab forwards
 		  if (record->event.pressed) {
@@ -335,21 +378,6 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     rgblight_set_layer_state(3, layer_state_cmp(state, 3));
     rgblight_set_layer_state(4, layer_state_cmp(state, 4));
 	
-	/*static uint16_t underglow_brightness = 140; //This code can be used to have edge and underglow LEDs selectively brighter
-	static uint16_t perkey_brightness = 80;
-	static uint16_t lastrow_brightness = 50; //for less shine-through at case edges (brighter is okay for FR4 plate)
-	static uint16_t current_hue = 0; //hue calculated to be used
-	static uint16_t layer0_huestart = 56; //hue gradient starting colour - green/blue
-	static uint16_t layer0_hueincrement = 2; //hue gradient colour increment
-	static uint16_t layer1_huestart = 15; //hue gradient starting colour - orange/green
-	static uint16_t layer1_hueincrement = 2; //hue gradient colour increment
-	static uint16_t layer2_huestart = 220; //hue gradient starting colour - magenta/orange (this layer is for photoshop)
-	static uint16_t layer2_hueincrement = 2; //hue gradient colour increment
-	static uint16_t layer3_huestart = 135; //hue gradient starting colour - blue/purple
-	static uint16_t layer3_hueincrement = 2; //hue gradient colour increment
-	static uint16_t layer4_huestart = 30; //hue gradient starting colour - orange/red
-	static uint16_t layer4_hueincrement = 1; //hue gradient colour increment
-	*/
 	// This is what the LED layout is.
 	// 1,                 0, 
 	// 3,                 2, 
@@ -362,67 +390,14 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 	switch(biton32(state)){ // Change all other LEDs based on layer state as well
 		case 0:
 			rgblight_sethsv_noeeprom(50,255,100);
-			/*for (uint8_t i = 0; i < RGBLED_NUM; i++){ //This code can be used to have edge and underglow LEDs selectively brighter
-				current_hue=i*layer0_hueincrement+layer0_huestart; //Determine the calculated hue
-				if(current_hue>255){current_hue=current_hue-255;}; //Roll over max hue of 256
-				if (i == 1 || i == 3 || i == 9 || i == 18 || i == 25 || i == 27) {	  
-				  rgblight_sethsv_at(current_hue,255,underglow_brightness,i);
-				} else if (i == 0 || i == 2 || i == 4 || i == 14 || i == 23) { //make right side of the numpad underglow darker
-				  rgblight_sethsv_at(current_hue,255,lastrow_brightness,i);
-				} else if (i == 26 || i == 24 || i == 19 || i ==10) { //make per key end LEDs lighter to reduce glare
-				  rgblight_sethsv_at(current_hue,255,lastrow_brightness,i);
-				} else {
-				  rgblight_sethsv_at(current_hue,255,perkey_brightness,i);
-				};
-			};*/
 			break;
 		case 1:
 			rgblight_sethsv_noeeprom(5,255,100);
-			/*for (uint8_t i = 0; i < RGBLED_NUM; i++){ //This code can be used to have edge and underglow LEDs selectively brighter
-				current_hue=i*layer1_hueincrement+layer1_huestart; //Determine the calculated hue
-				if(current_hue>255){current_hue=current_hue-255;}; //Roll over max hue of 256
-				if (i == 1 || i == 3 || i == 9 || i == 18 || i == 25 || i == 27) {	  
-				  rgblight_sethsv_at(current_hue,255,underglow_brightness,i);
-				} else if (i == 0 || i == 2 || i == 4 || i == 14 || i == 23) { //make right side of the numpad underglow darker
-				  rgblight_sethsv_at(current_hue,255,lastrow_brightness,i);
-				} else if (i == 26 || i == 24 || i == 19 || i ==10) { //make per key end LEDs lighter to reduce glare
-				  rgblight_sethsv_at(current_hue,255,lastrow_brightness,i);
-				} else {
-				  rgblight_sethsv_at(current_hue,255,perkey_brightness,i);
-				};
-			};*/
 			break;
 		case 2:
-			rgblight_sethsv_noeeprom(128,255,100);
-			/*for (uint8_t i = 0; i < RGBLED_NUM; i++){ //This code can be used to have edge and underglow LEDs selectively brighter
-				current_hue=i*layer2_hueincrement+layer2_huestart; //Determine the calculated hue
-				if(current_hue>255){current_hue=current_hue-255;}; //Roll over max hue of 256
-				if (i == 1 || i == 3 || i == 9 || i == 18 || i == 25 || i == 27) {	  
-				  rgblight_sethsv_at(current_hue,255,underglow_brightness,i);
-				} else if (i == 0 || i == 2 || i == 4 || i == 14 || i == 23) { //make right side of the numpad underglow darker
-				  rgblight_sethsv_at(current_hue,255,lastrow_brightness,i);
-				} else if (i == 26 || i == 24 || i == 19 || i ==10) { //make per key end LEDs lighter to reduce glare
-				  rgblight_sethsv_at(current_hue,255,lastrow_brightness,i);
-				} else {
-				  rgblight_sethsv_at(current_hue,255,perkey_brightness,i);
-				};
-			};*/
 			break;
 		case 3:
 			rgblight_sethsv_noeeprom(215,255,100);
-			/*for (uint8_t i = 0; i < RGBLED_NUM; i++){ //This code can be used to have edge and underglow LEDs selectively brighter
-				current_hue=i*layer3_hueincrement+layer3_huestart; //Determine the calculated hue
-				if(current_hue>255){current_hue=current_hue-255;}; //Roll over max hue of 256
-				if (i == 1 || i == 3 || i == 9 || i == 18 || i == 25 || i == 27) {	  
-				  rgblight_sethsv_at(current_hue,255,underglow_brightness,i);
-				} else if (i == 0 || i == 2 || i == 4 || i == 14 || i == 23) { //make right side of the numpad underglow darker
-				  rgblight_sethsv_at(current_hue,255,lastrow_brightness,i);
-				} else if (i == 26 || i == 24 || i == 19 || i ==10) { //make per key end LEDs lighter to reduce glare
-				  rgblight_sethsv_at(current_hue,255,lastrow_brightness,i);
-				} else {
-				  rgblight_sethsv_at(current_hue,255,perkey_brightness,i);
-				};
-			};*/
 			break;
 		case 4:
 			rgblight_sethsv_noeeprom(15,255,100);
@@ -444,3 +419,29 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return state;
 	};
 #endif
+
+
+bool encoder_update_user(uint8_t index, bool clockwise) { // QMK encoder functionality
+  #ifdef VIA_ENABLE //Add in VIA setting of rotary encoder keymap
+	    if (index == 0) { // First encoder
+			if (clockwise) {
+				action_exec((keyevent_t){.key = (keypos_t){.row = 0, .col = 0}, .pressed = true, .time = (timer_read() | 1)  });  //Time is 1 tick otherwise empty event
+				action_exec((keyevent_t){.key = (keypos_t){.row = 0, .col = 0}, .pressed = false, .time = (timer_read() | 1)  });
+				
+				rgb_state[24] = RGB_HIT;
+				} 
+				else {
+				action_exec((keyevent_t){.key = (keypos_t){.row = 0, .col = 2}, .pressed = true, .time = (timer_read() | 1)  });
+				action_exec((keyevent_t){.key = (keypos_t){.row = 0, .col = 2}, .pressed = false, .time = (timer_read() | 1)  });
+				
+				rgb_state[26] = RGB_HIT;
+				}
+		}
+		/*if (clockwise) { //This code only works for single keypresses with the rotary encoder
+		  tap_code(dynamic_keymap_get_keycode(biton32(layer_state), 0, 0)); //Allow setting of keymap in VIA
+		} else {
+		  tap_code(dynamic_keymap_get_keycode(biton32(layer_state), 0, 2)); //Allow setting of keymap in VIA
+		}*/
+  #endif
+  return true;
+}
