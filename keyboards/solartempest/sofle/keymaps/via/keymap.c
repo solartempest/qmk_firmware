@@ -56,7 +56,7 @@ static uint16_t held_shift = 0;
 #endif
 
 
-#ifdef COMBO_ENABLE //(+42 firmware size for this combo). SBS takes care of this combo, so it is an example only and can be replaced with others as required.
+/*#ifdef COMBO_ENABLE //(+42 firmware size for this combo). SBS takes care of this combo, so it is an example only and can be replaced with others as required.
 	enum combo_events {
 	  sbs_delword
 	};
@@ -75,7 +75,7 @@ static uint16_t held_shift = 0;
 		  break;
 	  }
 	}
-#endif
+#endif*/
 
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {  //Can skip these layouts to save space when using only VIA.
