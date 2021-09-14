@@ -89,8 +89,8 @@
 #define RGBLIGHT_EFFECT_STATIC_GRADIENT //Firmware size (+262)
 #define RGBLIGHT_LIMIT_VAL 160 //Power draw may exceed 0.6A at max brightness with white colour.
 #define RGBLIGHT_LAYERS
-#define RGBLIGHT_LAYERS_OVERRIDE_RGB_OFF
 #define RGBLIGHT_SLEEP
+//#define RGBLIGHT_LAYERS_OVERRIDE_RGB_OFF //Shows lock key lighting status even when RGB is off
 
 
 //RGB LED Conversion macro from physical array to electric array (+146 to firmware size)

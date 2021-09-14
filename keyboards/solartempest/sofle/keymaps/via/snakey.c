@@ -265,15 +265,16 @@
 		oled_set_cursor(0,3);
 		switch (get_highest_layer(layer_state)) {
 			case 0:
+			case 2:
 				oled_write("Base ", false);
 				break;
 			case 1:
 				oled_write("Game ", false);
 				break;
-			case 3:
+			case 4:
 				oled_write("Raise", false);
 				break;
-			case 2:
+			case 3:
 				oled_write("Lower", false);
 				break;
 		}

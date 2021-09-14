@@ -61,16 +61,14 @@ qmk compile -kb solartempest/sofle -km via
 
 ## Flashing
 
-Flash using the correct command below (or use QMK Toolbox like me):
+Flash using the correct command below or use QMK Toolbox. Specifying side during compile is unnecessary as Master Left is defined:
 
 ```sh
 # for pro micro-based builds
-qmk flash -kb solartempest/sofle -km via -bl avrdude-split-left
-qmk flash -kb solartempest/sofle -km via -bl avrdude-split-right
+qmk flash -kb solartempest/sofle -km via
 
 # for Elite C or dfu bootloader builds
-qmk flash -kb solartempest/sofle -km via -bl dfu-split-left
-qmk flash -kb solartempest/sofle -km via -bl dfu-split-right
+qmk flash -kb solartempest/sofle -km via
 ```
 
 These commands can be mixed if, for example, you have an Elite C on the left and a pro micro on the right.

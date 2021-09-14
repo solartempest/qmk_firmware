@@ -48,13 +48,13 @@
 		oled_write_ln_P(PSTR("LAYER"), false);
 		switch (get_highest_layer(layer_state)) {
 			case 0:
-			case 1:
+			case 2:
 				oled_write_P(PSTR("Base\n"), false);
 				break;
-			case 2:
+			case 3:
 				oled_write_P(PSTR("Raise"), false);
 				break;
-			case 3:
+			case 4:
 				oled_write_P(PSTR("Lower"), false);
 				break;
 			default:

@@ -19,4 +19,4 @@
 #pragma once
 
 // Set number of layers for VIA, each is 30 bytes
-#define DYNAMIC_KEYMAP_LAYER_COUNT 4
+#define DYNAMIC_KEYMAP_LAYER_COUNT 5
