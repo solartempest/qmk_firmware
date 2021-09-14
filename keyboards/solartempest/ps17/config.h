@@ -140,6 +140,6 @@
 #define LOCKING_RESYNC_ENABLE
 
 #define COMBO_COUNT 6 //Number of tap combos used
-#define COMBO_TERM 350 //Default combo time is 200ms
+#define COMBO_TERM 400 //Default combo time is 200ms
 
 #define TAPPING_TERM 200 //Tap dance time
