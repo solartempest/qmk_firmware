@@ -130,9 +130,16 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
                 register_code(KC_PGDN);
                 register_mods(MOD_BIT(KC_RSFT));
             } else if (get_mods() & MOD_BIT(KC_LCTL)) {  // if holding Left Ctrl, navigate next word
-                    tap_code16(LCTL(KC_RGHT));
-            } else if (get_mods() & MOD_BIT(KC_LALT)) {  // if holding Left Alt, change media next track
-                tap_code(KC_MEDIA_NEXT_TRACK);
+                tap_code16(LCTL(KC_RGHT));
+            } else if (get_mods() & MOD_BIT(KC_LALT)) {  // if holding Left Alt, move window to right monitor
+                unregister_mods(MOD_BIT(KC_LALT));
+				register_code(KC_LSFT);
+				register_code(KC_LWIN);
+				register_code(KC_RIGHT);
+				unregister_code(KC_RIGHT);
+				unregister_code(KC_LWIN);
+				unregister_code(KC_LSFT);
+                register_mods(MOD_BIT(KC_LALT));
             } else  {
                 switch (selected_layer) {
                 case _FN1:
@@ -157,8 +164,15 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
                 register_mods(MOD_BIT(KC_RSFT));
             } else if (get_mods() & MOD_BIT(KC_LCTL)) {  // if holding Left Ctrl, navigate previous word
                 tap_code16(LCTL(KC_LEFT));
-            } else if (get_mods() & MOD_BIT(KC_LALT)) {  // if holding Left Alt, change media previous track
-                tap_code(KC_MEDIA_PREV_TRACK);
+            } else if (get_mods() & MOD_BIT(KC_LALT)) {  // if holding Left Alt, move window to left monitor
+                unregister_mods(MOD_BIT(KC_LALT));
+				register_code(KC_LSFT);
+				register_code(KC_LWIN);
+				register_code(KC_LEFT);
+				unregister_code(KC_LEFT);
+				unregister_code(KC_LWIN);
+				unregister_code(KC_LSFT);
+                register_mods(MOD_BIT(KC_LALT));
             } else {
                 switch (selected_layer) {
                 case _FN1:
