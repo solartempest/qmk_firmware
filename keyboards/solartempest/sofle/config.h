@@ -73,6 +73,7 @@
 	#define OLED_BRIGHTNESS 90 // Default 100.
 	#define SPLIT_WPM_ENABLE //Enable WPM across split keyboards (+268).
 	#define SPLIT_OLED_ENABLE //Synx on/off OLED state between halves (+100).
+	#define OLED_LOGO //Enable to print custom logo on slave side, disable to save space.
 #endif
 
 // Combo settings
