@@ -12,9 +12,8 @@ For detailed instructions on using VIA and flashing, please refer to the section
 
 # Custom Features:
 
--   9 remappable rotary encoder controlling a variety of different things!
+-   9 remappable rotary encoder controling a variety of different things!
 -   RGB underglow support and remapped to physical locations.
--   When turning the 3 large rotary encoders the RGB LEDs underneath animate.
 -   Adds custom layer lighting with custom gradients for each and static colours for the switches.
 -   Adds white caps lock, scroll lock, and num lock key indicators on the top row.
 -   VIA support included by default.
@@ -33,7 +32,6 @@ Make example for this keyboard (after setting up your build environment):
 -   You will need to use an ISP Programmer to directly flash the 9e. No board reset is required, as you will flash the MCU directly.
 -   I used Prog ISP V2.0 but other AVR programmers will also work.
 -   Use a 12P AWM 20624 ribbon cable with FCP-12P-1.0mm breakout board. Only 10 pins are used.
--   Plug in the ribbon cable with the data pins facing away from the PCB.
 
 ## Using with VIA
 
