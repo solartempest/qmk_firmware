@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "rgb_matrix_map.h"
 #include "jonavin.h"
 
+bool spam_arrow;
+bool teams_muted;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -97,9 +99,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         if (keymap_config.no_gui) {
             rgb_matrix_set_color(LED_LWIN, RGB_RED);  //light up Win key when disabled
         }
+		if(spam_arrow==1) { //Change LED colour on nav cluster to indicate on
+			for (uint8_t i=0; i<ARRAYSIZE(LED_LIST_ARROWS); i++) {
+				rgb_matrix_set_color(LED_LIST_ARROWS[i], 255,120,24);
+			};
+		}
+		if(teams_muted==1) { //Change LED colour on LEDs for key 1 and underglow to orange to indicate muted
+			for (uint8_t i=0; i<ARRAYSIZE(LED_LIST_NAV); i++) {
+				rgb_matrix_set_color(LED_LIST_NAV[i], 255,120,18);
+			};
+		}
         switch(get_highest_layer(layer_state)){  // special handling per layer
         case _FN1:  // on Fn layer select what the encoder does when pressed
-            /*rgb_matrix_set_color(LED_R2, RGB_RED);
+            /*rgb_matrix_set_color(LED_R2, RGB_RED); //Show the active layer as red
             rgb_matrix_set_color(LED_R3, RGB_RED);
             rgb_matrix_set_color(LED_R4, RGB_RED);
             rgb_matrix_set_color(LED_FN, RGB_RED); //FN key*/
@@ -192,3 +204,4 @@ void keyboard_post_init_keymap(void) {
         rgb_matrix_set_color_all(RGB_NAUTILUS); // Default startup colour
     #endif
 }
+

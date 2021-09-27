@@ -17,12 +17,12 @@
 #pragma once
 
 #define TAPPING_TOGGLE 2 // TT set to two taps
+#define TAPPING_TERM 180
 
 /*  Handle GRAVESC combo keys */
 //#define GRAVE_ESC_ALT_OVERRIDE  //Always send Escape if Alt is pressed
 //#define GRAVE_ESC_CTRL_OVERRIDE  //Always send Escape if Control is pressed
 
-#define TAPPING_TERM 180
 
 #ifdef RGB_MATRIX_ENABLE
     #define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_HUE_WAVE
