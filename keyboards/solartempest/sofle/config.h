@@ -71,8 +71,11 @@
 #ifdef OLED_ENABLE
 	#define OLED_TIMEOUT 80000 //120000 = 2 minutes in ms.
 	#define OLED_BRIGHTNESS 90 // Default 100.
-	#define SPLIT_WPM_ENABLE //Enable WPM across split keyboards (+268).
 	#define SPLIT_OLED_ENABLE //Synx on/off OLED state between halves (+100).
+	//#define SPLIT_WPM_ENABLE //Enable WPM across split keyboards (+268).
+	//#define SPLIT_LAYER_STATE_ENABLE
+	//#define SPLIT_LED_STATE_ENABLE
+	//#define SPLIT_MODS_ENABLE
 	#define OLED_LOGO //Enable to print custom logo on slave side, disable to save space.
 #endif
 
@@ -81,6 +84,15 @@
 	#define COMBO_COUNT 1 //Number of tap combos used
 	#define COMBO_TERM 400 //Default combo time is 200ms. This is the time delay allowed between deleting each whole word with shift-backspace.
 #endif
+
+// Pimoroni trackball settings
+#ifdef POINTING_DEVICE_ENABLE
+	#define PIMORONI_TRACKBALL_ROTATE
+	#define PIMORONI_TRACKBALL_INVERT_Y
+	//#define PIMORONI_TRACKBALL_INVERT_X
+	//#define PIMORONI_TRACKBALL_CLICK //Not compatible with having mouse keys on keymap
+#endif               
+
 
 // Add RGB underglow
 #define RGB_DI_PIN D3

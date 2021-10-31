@@ -21,9 +21,9 @@
 #ifdef OLED_ENABLE
 	uint32_t oled_timer = 0; //OLED timeout
 	led_t led_usb_state;
-
-	// KEYBOARD PET START
+	
 	#define KEYBOARD_PET
+	// KEYBOARD PET START
 	 
 	// settings
 	#define MIN_WALK_SPEED 10
@@ -40,12 +40,11 @@
 	uint8_t current_frame = 0;
 	 
 	// status variables
-	int current_wpm_read = 0;
 	bool isSneaking = false;
 	bool isJumping = false;
 	bool showedJump = true;
 	bool isBarking = false;
-	 
+	
 	#ifdef OLED_LOGO
 		static void render_logo(int LUNA_X, int LUNA_Y) {
 			static const char PROGMEM luna_logo[] = {
@@ -86,7 +85,7 @@
 				0xff, 0xff, 0xff, 0xff, 0x7e, 0x1c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 			}
 		};
-	 
+	 /*
 		// Walk
 		static const char PROGMEM walk[2][ANIM_SIZE] = {
 			// 'walk1', 32x22px
@@ -131,7 +130,7 @@
 				0x00, 0x07, 0x1e, 0x3c, 0x78, 0xff, 0xff, 0x7f, 0x01, 0x00, 0x07, 0x1f, 0x3f, 0x7c, 0x78, 0xff, 
 				0xff, 0x7f, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 			}
-		};
+		};*/
 	 
 		// Bark
 		static const char PROGMEM bark[2][ANIM_SIZE] = {
@@ -210,7 +209,7 @@
 	 
 			} else if(isSneaking) {
 				oled_write_raw_P(sneak[abs(1 - current_frame)], ANIM_SIZE);
-	 
+			/*
 			} else if(current_wpm_read <= MIN_WALK_SPEED) {
 				oled_write_raw_P(sit[abs(1 - current_frame)], ANIM_SIZE);
 	 
@@ -219,7 +218,11 @@
 	 
 			} else {
 				oled_write_raw_P(run[abs(1 - current_frame)], ANIM_SIZE);
+			}*/
+			} else {
+				oled_write_raw_P(sit[abs(1 - current_frame)], ANIM_SIZE);
 			}
+	 
 		}
 	 
 		// animation timer
@@ -231,22 +234,14 @@
 	// KEYBOARD PET END
 
 	static void print_logo_narrow(void) {
-		oled_set_cursor(0,2);
+		oled_set_cursor(0,4);
 		oled_write("SOLAR", false);
-		oled_set_cursor(0,3);
+		oled_set_cursor(0,5);
 		oled_write("TMPST", false);
 	 
 		#ifdef OLED_LOGO
-			render_logo(0,7); //Not defining this in config.h will save 112 bytes.
+			render_logo(0,9); //Not defining this in config.h will save 112 bytes.
 		#endif
-		
-	 	/* wpm counter */
-		char wpm_str[8];
-		oled_set_cursor(0,13);
-		sprintf(wpm_str, " %03d", current_wpm_read);
-		oled_write(wpm_str, false);
-		oled_set_cursor(0,14);
-		oled_write(" wpm", false);
 	}
 	 
 	static void print_status_narrow(void) {
@@ -261,11 +256,11 @@
 				oled_write("UNDEF", false);
 		}*/
 	 
-		/* Print current layer */
-		oled_set_cursor(0,2);
+		// Print current layer
+		oled_set_cursor(0,1);
 		oled_write("LAYER", false);
 	 
-		oled_set_cursor(0,3);
+		oled_set_cursor(0,2);
 		switch (get_highest_layer(layer_state)) {
 			case 0:
 			case 2:
@@ -282,18 +277,18 @@
 				break;
 		}
 		
-		/* lock status */
-		oled_set_cursor(0,6);
+		// lock status
+		oled_set_cursor(0,5);
 		oled_write("LOCK", false);
-		oled_set_cursor(0,7);
+		oled_set_cursor(0,6);
 		oled_write("Caps", led_usb_state.caps_lock);
-		oled_set_cursor(0,8);
+		oled_set_cursor(0,7);
 		oled_write("Num", !(led_usb_state.num_lock));
-		oled_set_cursor(0,9);
+		oled_set_cursor(0,8);
 		oled_write("Scrl", led_usb_state.scroll_lock);
 	 
 		/* KEYBOARD PET RENDER START */
-		render_luna(0,13);
+		render_luna(0,11);
 		/* KEYBOARD PET RENDER END */
 	}
 	 
@@ -302,9 +297,6 @@
 	}
 	 
 	void oled_task_user(void) {
-		/* KEYBOARD PET VARIABLES START */
-		current_wpm_read = get_current_wpm();
-		/* KEYBOARD PET VARIABLES END */
 		led_usb_state = host_keyboard_led_state();
 
 		if (is_keyboard_master()) { //Drashna's OLED timeout off code for animations

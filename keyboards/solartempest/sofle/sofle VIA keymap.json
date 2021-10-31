@@ -29,6 +29,16 @@
       "name": "Shift-BSPC",
       "title": "Shift-Backspace to Delete Whole Words",
       "shortName": "SBS"
+    },
+    {
+      "name": "Trackball Scroll",
+      "title": "Pimoroni Trackball Scroll Mode",
+      "shortName": "PM_SCROLL"
+    },
+    {
+      "name": "Trackball Precision",
+      "title": "Pimoroni Trackball Precision Mode",
+      "shortName": "PM_PRECISION"
     }
   ],
   "layouts": 
