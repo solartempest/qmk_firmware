@@ -1,6 +1,6 @@
 # Sofle Keyboard
 
-![SofleKeyboard version 2.1 RGB Keyhive](https://i.imgur.com/WH9OoWu.jpg)
+![SofleKeyboard version 2.1 RGB Keyhive](https://i.imgur.com/utkZbYS.jpeg)
 
 Sofle is 6×4+5 keys column-staggered split keyboard. Based on Lily58, Corne and Helix keyboards.
 
@@ -15,7 +15,6 @@ Build guide and log is available here: [SofleKeyboard build log/guide](https://j
 * Hardware Availability: [Keyhive](https://keyhive.xyz/shop/sofle)
 
 # Custom Features:
-
 ### OLED Features:
 -   Includes Snakey keyboard pet! Slithers according to WPM, bites, and sticks its tongue out at you!
 -	OLED displays current layer, lock key status, WPM, custom logo, and custom name.
@@ -23,6 +22,13 @@ Build guide and log is available here: [SofleKeyboard build log/guide](https://j
 -	Includes working Luna keyboard pet.
 -	Includes working Bongocat (disable RGB for sufficient space).
 -   Includes stock OLED code as well.
+
+### Trackball Features:
+-   Supports Pimoroni Trackball installed on master side.
+-	Default action is scrolling. Hold Raise layer for mouse mode.
+-	Mouse mode and precision mode are toggleable with trackball LED indication.
+-	Trackball LED shuts off when computer is sleeping.
+-	Clicking and dragging is enabled using mouse keys on keymap.
 
 ### RGB Features:
 -   Adds custom layer lighting with custom gradients for each layer.

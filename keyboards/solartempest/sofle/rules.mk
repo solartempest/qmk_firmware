@@ -26,4 +26,4 @@ SPACE_CADET_ENABLE = no 		# Save space by not using space cadet left/right shift
 
 POINTING_DEVICE_ENABLE = yes	# Enable Pimoroni Trackball
 QUANTUM_LIB_SRC += i2c_master.c
-#SRC += drivers/sensors/pimoroni_trackball.c # There is an issue with the rotation code in the current master. Modified version included in keymap.c instead.
+SRC += drivers/sensors/pimoroni_trackball.c

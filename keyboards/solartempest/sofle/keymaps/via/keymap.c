@@ -29,9 +29,7 @@
 #endif
 
 #ifdef POINTING_DEVICE_ENABLE
-	//#include "drivers/sensors/pimoroni_trackball.h" //Normally this is included, but the master code has an issue with the rotation code.
-	#include "pimoroni_trackball.c" //This is the master code with a workaround for scrolling rotation with inversion (line 146 only).
-	#include "pimoroni_trackball.h"
+	#include "drivers/sensors/pimoroni_trackball.h"
 	bool was_scrolling = true;	//Remember last state of trackball scrolling
 #endif
 
@@ -137,6 +135,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {  //Can skip these
 			currentReport.buttons &= ~button;
 		}
 		pointing_device_set_report(currentReport);
+	}
+	
+	bool pointing_device_task_user(pimoroni_data* trackball_data) { //Code from Dasky (Thanks!). This corrects the rotate/inversion scrolling issue currently in QMK Master.
+		if (trackball_is_scrolling()) {
+			pimoroni_data temp = *trackball_data;
+			trackball_data->up = temp.down;
+			trackball_data->down = temp.up;
+		}
+		return true;
 	}
 #endif
 
