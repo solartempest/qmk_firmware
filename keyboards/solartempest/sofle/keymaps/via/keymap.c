@@ -24,8 +24,8 @@
 	//Note that the keyboard animations below take a large amount of space!
 		//#include "bongocat.c" //OLED code for Bongocat, original code by foureight84. Disable RGBLIGHT to make enough space.
 		//#include "luna.c" //OLED code for Luna, original code by Hellsingcoder and adapted by Jackasaur.
-		//#include "snakey.c" //OLED code for Snakey, customized from Luna.
-		#include "snakey_minimal.c" //OLED code for Snakey, without WPM/related animations to save space.
+		//#include "snakey.c" //OLED code for Snakey, customized from Luna. If not used, do not use OLED_LOGO in config.h.
+		#include "snakey_minimal.c" //OLED code for Snakey, without WPM/related animations to save space. If not used, do not use OLED_LOGO in config.h.
 #endif
 
 #ifdef POINTING_DEVICE_ENABLE
@@ -279,7 +279,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 				case PM_PRECISION:
 					if (record->event.pressed) {
 						if (trackball_get_precision()==1){ //Enable toggling for trackball precision
-							trackball_set_precision(1.8);
+							trackball_set_precision(1.75);
 						} else{
 							trackball_set_precision(1);
 						}
@@ -368,8 +368,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_GRADIENT+8); //Set to static gradient 9
 		layer_move(0); //start on layer 0 to get the lighting activated in all cases. Remove to save a very small amount of space.
 		#ifdef POINTING_DEVICE_ENABLE
-			trackball_set_precision(1.8);
-			trackball_set_scrolling(true);
+			trackball_set_precision(1.75); //Start trackball with less precision
+			trackball_set_scrolling(true); //Start trackball in scrolling mode
 			run_trackball_cleanup();
 		#endif
 	}

@@ -76,7 +76,7 @@
 	//#define SPLIT_LAYER_STATE_ENABLE
 	//#define SPLIT_LED_STATE_ENABLE
 	//#define SPLIT_MODS_ENABLE
-	#define OLED_LOGO //Enable to print custom logo on slave side, disable to save space.
+	#define OLED_LOGO //Enable to print snakey custom logo on slave side, disable to save space.
 #endif
 
 // Combo settings
