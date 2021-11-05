@@ -35,7 +35,8 @@ uint16_t alt_tab_timer = 0;
 
 bool is_stretch_active = false; // Stretch Timer Code
 bool is_stretch_time = false;
-uint32_t stretch_timer = 0;
+uint16_t stretch_timer = 0;
+uint16_t stretch_minutes = 0;
 
 #ifdef VIA_ENABLE
 	enum custom_keycodes { //Use USER 00 instead of SAFE_RANGE for Via. VIA json must include the custom keycode.
@@ -254,10 +255,15 @@ void matrix_scan_user(void) {
     
   #ifdef RGBLIGHT_ENABLE //Stretch timer code
 	  if (is_stretch_active && !is_stretch_time) {
-		if (timer_elapsed(stretch_timer) > 2700000) { //Change RGB after 5s (Configurable. Test for 5s. 45 minutes is 2,700,000. 1 hour is 3,600,000)
+		if(timer_elapsed(stretch_timer)>60000) { //1 minute has passed. Timer is uint16 max.
+			stretch_minutes++;
+			stretch_timer = timer_read();
+		}
+		if (stretch_minutes > 30) { //Change RGB animation effect after set number of minutes.
 		  rgblight_set_effect_range(0, 42);
 		  rgblight_mode_noeeprom(RGBLIGHT_MODE_SNAKE);
 		  is_stretch_time = true;
+		  stretch_minutes = 0;
 		}
 	  }
   #endif
@@ -324,17 +330,20 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 				rgblight_sethsv_at(0,230,100,40); //Set LED to orange to indicate timer is on
 				is_stretch_active = 1;
 				is_stretch_time = 0;
+				stretch_minutes = 0;
 				}
 			else if(is_stretch_active==1) {
 				rgblight_set_effect_range(0, 42);
 				rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_GRADIENT+8);
 				rgblight_sethsv_at(0,230,100,40); //Set LED to orange to indicate timer is on
 				is_stretch_time = 0;
+				stretch_minutes = 0;
 				}
 			else {
 				rgblight_set_effect_range(0, 42);
 				rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_GRADIENT+8); //Set back to layer colours
 				is_stretch_time = 0;
+				stretch_minutes = 0;
 				}
 		  }
 		  return false;
