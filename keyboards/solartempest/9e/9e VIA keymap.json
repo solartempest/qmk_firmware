@@ -24,6 +24,11 @@
       "name": "Move Window Left",
       "title": "Move Window Left in Windows",
       "shortName": "MWL"
+    },
+    {
+      "name": "Stretch Timer",
+      "title": "Activate Stretch Timer",
+      "shortName": "STRT"
     }
   ],
   "layouts": 
