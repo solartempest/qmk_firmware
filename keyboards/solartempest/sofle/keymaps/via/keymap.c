@@ -155,6 +155,9 @@ void matrix_scan_user(void) {
       is_alt_tab_active = false;
     }
   }
+  #ifdef ENCODER_ENABLE
+	encoder_action_unregister();
+  #endif
 }
 
 

@@ -16,27 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 #ifdef ENCODER_ENABLE
-bool encoder_update_user(uint8_t index, bool clockwise) { //Allows for remapping of rotary encoder functions in VIA
-    if (index == 0) {
-        if (clockwise) {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 1, .col = 6}, .pressed = true, .time = (timer_read() | 1)  });  
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 1, .col = 6}, .pressed = false, .time = (timer_read() | 1)  });
-        	} 
-        	else {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 3, .col = 6}, .pressed = true, .time = (timer_read() | 1)  });
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 3, .col = 6}, .pressed = false, .time = (timer_read() | 1)  });  
-            }
-    } else if (index == 1) {
-        if (clockwise) {  //Double check rotation on new flash versus via mapping
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 6, .col = 6}, .pressed = true, .time = (timer_read() | 1)  });  
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 6, .col = 6}, .pressed = false, .time = (timer_read() | 1)  });
-        	} 
-        	else {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 8, .col = 6}, .pressed = true, .time = (timer_read() | 1)  });
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 8, .col = 6}, .pressed = false, .time = (timer_read() | 1)  });  
-            }
-    }
-	return true;
-}
+	static uint8_t  encoder_state[2] = {0};	//Thanks to Drashna for this improved code with better extensibility.
+	static keypos_t encoder_ccw[2] = {{6, 3}, {6, 8}};
+	static keypos_t encoder_cw[2] = {{6, 1}, {6, 6}};
+
+	void encoder_action_unregister(void) {
+		for (int index = 0; index < 2; ++index) {
+			if (encoder_state[index]) {
+				keyevent_t encoder_event = (keyevent_t){.key = encoder_state[index] >> 1 ? encoder_cw[index] : encoder_ccw[index], .pressed = false, .time = (timer_read() | 1)};
+				encoder_state[index]     = 0;
+				action_exec(encoder_event);
+			}
+		}
+	}
+
+	void encoder_action_register(uint8_t index, bool clockwise) {
+		keyevent_t encoder_event = (keyevent_t){.key = clockwise ? encoder_cw[index] : encoder_ccw[index], .pressed = true, .time = (timer_read() | 1)};
+		encoder_state[index]     = (clockwise ^ 1) | (clockwise << 1);
+		action_exec(encoder_event);
+	}
+
+	bool encoder_update_user(uint8_t index, bool clockwise) {
+		encoder_action_register(index, clockwise);
+		return false;
+	};
 #endif

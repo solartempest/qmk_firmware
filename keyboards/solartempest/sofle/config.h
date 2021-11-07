@@ -89,6 +89,7 @@
 #ifdef POINTING_DEVICE_ENABLE
 	#define PIMORONI_TRACKBALL_ROTATE
 	#define PIMORONI_TRACKBALL_INVERT_Y
+	#define PIMORONI_TRACKBALL_INTERVAL_MS 6 //Default is 8ms
 	//#define PIMORONI_TRACKBALL_INVERT_X
 	//#define PIMORONI_TRACKBALL_CLICK //Not compatible with having mouse keys on keymap
 #endif               
