@@ -71,7 +71,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 		KC_CAPS, KC_SLCK, KC_NLCK, KC_P4, KC_P5, KC_P6,			//Keys Row 2
 		RGB_HUD, A(KC_F4), RGB_HUI, 							//Rotary Encoder 5
 		ATABR, KC_MSTP, ATABF,									//Rotary Encoder 3
-		KC_WREF, KC_MYCM, KC_P0, KC_P1, KC_P2, KC_P3,			//Keys Row 3
+		KC_WREF, STRT, KC_P0, KC_P1, KC_P2, KC_P3,				//Keys Row 3
 		KC_MS_WH_UP, C(KC_W), KC_MS_WH_DOWN, 					//Rotary Encoder 6
 		C(S(KC_TAB)), KC_HOME, C(KC_TAB),						//Rotary Encoder 8
 		C(KC_PMNS), KC__MUTE, C(KC_PPLS),						//Rotary Encoder 9
@@ -206,8 +206,47 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 
-void matrix_init_user(void) {
-}
+
+#ifdef ENCODER_ENABLE
+	static uint8_t  encoder_state[9] = {0};
+	static keypos_t encoder_ccw[9] = {{2, 0}, {2, 1}, {2, 2}, {11, 0}, {11, 1}, {11, 2}, {11, 3}, {5, 3}, {8, 3}};
+	static keypos_t encoder_cw[9] = {{0, 0}, {0, 1}, {0, 2}, {9, 0}, {9, 1}, {9, 2}, {9, 3}, {3, 3}, {6, 3}};
+
+	void encoder_action_unregister(void) {
+		for (int index = 0; index < 9; ++index) {
+			if (encoder_state[index]) {
+				if(index==0){	//Add rotating effect
+					is_encoder1_rotate = true;  
+					encoder_timer = timer_read();
+				}
+				else if (index==5){
+					is_encoder6_rotate = true;  
+					encoder_timer = timer_read();
+				}
+				else if(index==7){
+					is_encoder7_rotate = true;  
+					encoder_timer = timer_read();
+				}
+				keyevent_t encoder_event = (keyevent_t){.key = encoder_state[index] >> 1 ? encoder_cw[index] : encoder_ccw[index], .pressed = false, .time = (timer_read() | 1)};
+				encoder_state[index]     = 0;
+				action_exec(encoder_event);
+			}
+		}
+	}
+
+	void encoder_action_register(uint8_t index, bool clockwise) {
+		keyevent_t encoder_event = (keyevent_t){.key = clockwise ? encoder_cw[index] : encoder_ccw[index], .pressed = true, .time = (timer_read() | 1)};
+		encoder_state[index]     = (clockwise ^ 1) | (clockwise << 1);
+		action_exec(encoder_event);
+	}
+
+	bool encoder_update_user(uint8_t index, bool clockwise) {
+		encoder_action_register(index, clockwise);
+		return false;
+	};
+#endif
+
+
 
 void matrix_scan_user(void) {
   if (is_alt_tab_active) {
@@ -216,8 +255,25 @@ void matrix_scan_user(void) {
       is_alt_tab_active = false;
     }
   }
-
   
+    
+  #ifdef RGBLIGHT_ENABLE //Stretch timer code
+	  if (is_stretch_active && !is_stretch_time) {
+		if(timer_elapsed(stretch_timer)>60000) { //1 minute has passed. Timer is uint16 max.
+			stretch_minutes++;
+			stretch_timer = timer_read();
+		}
+		if (stretch_minutes > 30) { //Change RGB animation effect after set number of minutes.
+		  rgblight_set_effect_range(0, 42);
+		  rgblight_mode_noeeprom(RGBLIGHT_MODE_SNAKE);
+		  is_stretch_time = true;
+		  stretch_minutes = 0;
+		}
+	  }
+  #endif
+  
+  
+  encoder_action_unregister();
   #ifdef RGBLIGHT_ENABLE //Add rotation animations underneath rotary encoders when turning
 	if (!encoder_effect && is_encoder1_rotate) { //Turn on the effect for encoder 1
 		rgblight_set_effect_range(0, 4);
@@ -238,8 +294,8 @@ void matrix_scan_user(void) {
 		if(encoder_effect){
 			rgblight_set_effect_range(0, 42);
 			rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_GRADIENT+8);
-			if(is_stretch_time){
-				rgblight_sethsv_at(0,230,100,40); //Set LED to orange to indicate timer is on
+			if(is_stretch_active){ //Maintain orange LED to indicate stretch timer is still on.
+				rgblight_sethsv_at(0,230,100,40);
 			}
 		}
 		is_encoder1_rotate = false;
@@ -250,21 +306,6 @@ void matrix_scan_user(void) {
 		is_encoder1_rotate = false;	//Wait until encoder is turned again
 		is_encoder6_rotate = false;
 		is_encoder7_rotate = false;
-	  }
-  #endif
-    
-  #ifdef RGBLIGHT_ENABLE //Stretch timer code
-	  if (is_stretch_active && !is_stretch_time) {
-		if(timer_elapsed(stretch_timer)>60000) { //1 minute has passed. Timer is uint16 max.
-			stretch_minutes++;
-			stretch_timer = timer_read();
-		}
-		if (stretch_minutes > 30) { //Change RGB animation effect after set number of minutes.
-		  rgblight_set_effect_range(0, 42);
-		  rgblight_mode_noeeprom(RGBLIGHT_MODE_SNAKE);
-		  is_stretch_time = true;
-		  stretch_minutes = 0;
-		}
 	  }
   #endif
 }
@@ -348,114 +389,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		  }
 		  return false;
 	}
-	return true;
-}
-
-
-bool encoder_update_user(uint8_t index, bool clockwise) 
-{
-    if (index == 0) { /* 1 encoder */
-        if (clockwise) {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 0, .col = 0}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});  
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 0, .col = 0}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});
-			is_encoder1_rotate = true;  
-			encoder_timer = timer_read();
-        	} 
-        	else {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 0, .col = 2}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 0, .col = 2}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});
-			is_encoder1_rotate = true;  
-			encoder_timer = timer_read();
-            }
-    }
-    else if (index == 1) { /* 2 encoder */
-        if (clockwise) {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 1, .col = 0}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});  
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 1, .col = 0}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});
-        	} 
-        	else {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 1, .col = 2}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 1, .col = 2}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});  
-            }
-    }
-    else if (index == 2) { /* 3 encoder */
-        if (clockwise) {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 2, .col = 0}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});  
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 2, .col = 0}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});
-        	} 
-        	else {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 2, .col = 2}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 2, .col = 2}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});  
-            }
-    }
-    else if (index == 3) { /* 4 encoder */
-        if (clockwise) {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 0, .col = 9}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});  
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 0, .col = 9}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});
-        	} 
-        	else {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 0, .col = 11}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 0, .col = 11}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});  
-            }
-    }
-    else if (index == 4) { /* 5 encoder */
-        if (clockwise) {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 1, .col =9}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});  
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 1, .col =9}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});
-        	} 
-        	else {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 1, .col = 11}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 1, .col = 11}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});  
-            }
-    }
-    else if (index == 5) { /* 6 encoder */
-        if (clockwise) {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 2, .col = 9}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});  
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 2, .col = 9}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});
-			is_encoder6_rotate = true;  
-			encoder_timer = timer_read();
-        	} 
-        	else {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 2, .col = 11}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 2, .col = 11}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});
-			is_encoder6_rotate = true;  
-			encoder_timer = timer_read();
-            }
-    }
-    else if (index == 6) { /* 7 encoder */
-        if (clockwise) {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 3, .col = 9}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});  
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 3, .col = 9}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});
-			is_encoder7_rotate = true;  
-			encoder_timer = timer_read();
-        	} 
-        	else {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 3, .col = 11}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 3, .col = 11}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});
-			is_encoder7_rotate = true;  
-			encoder_timer = timer_read();
-            }
-    }
-    else if (index == 7) { /* 8 encoder */
-        if (clockwise) {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 3, .col = 3}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});  
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 3, .col = 3}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});
-        	} 
-        	else {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 3, .col = 5}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 3, .col = 5}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});  
-            }
-    }
-    else if (index == 8) { /* 9 encoder */
-        if (clockwise) {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 3, .col = 6}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});  
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 3, .col = 6}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});
-        	} 
-        	else {
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 3, .col = 8}, .pressed = true, .time = (timer_read() | 1)  /* time should not be 0 */});
-        	action_exec((keyevent_t){.key = (keypos_t){.row = 3, .col = 8}, .pressed = false, .time = (timer_read() | 1)  /* time should not be 0 */});  
-            }
-    }
 	return true;
 }
 
