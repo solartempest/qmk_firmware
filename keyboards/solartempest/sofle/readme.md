@@ -1,10 +1,10 @@
-### -- Note: When flashing this firmware, be sure to load the VIA keymap and layout files otherwise your keys won't work! Please refer to the sections below. --
+### --- Note: When flashing this firmware, be sure to load the VIA keymap and layout files otherwise your keys won't work! Please refer to the sections below. ---
 
 # Sofle Keyboard
 
 ![SofleKeyboard version 2.1 RGB Keyhive](https://i.imgur.com/utkZbYS.jpeg)
 
-Sofle is a 58-key column-staggered split keyboard with rotary encoders, OLEDs, trackball, and haptic feedback. Based on Lily58, Corne and Helix keyboards.
+Sofle is a 58-key column-staggered split keyboard with rotary encoders and OLEDs with support for a trackball and haptic feedback. Based on Lily58, Corne and Helix keyboards.
 
 For details about the keyboard design, refer to Josef's blog: [Sofle Keyboard - a split keyboard based on Lily58 and Crkbd](https://josef-adamcik.cz/electronics/let-me-introduce-you-sofle-keyboard-split-keyboard-based-on-lily58.html)
 
