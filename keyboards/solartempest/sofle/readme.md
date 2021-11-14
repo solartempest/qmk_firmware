@@ -54,7 +54,7 @@ Build guide and log is available here: [SofleKeyboard build log/guide](https://j
 -   Double tap layers to stay on a layer instead of momentary push.
 -   Symmetric modifiers (CMD/Super, Alt/Opt, Ctrl, Shift).
 
-## Using with VIA
+## Using with VIA (Important! Please Read.)
 
 -   After flashing, in VIA make sure to Import Keymap, which is "sofle VIA keymap.json". This will alow VIA to recognize the updated layout and custom functions. VIA will not auto-recognize the keyboard with this firmware because of the necessary customization.
 -   Go to Save+Load to Load Saved Layout. You can import my own layout "sofle VIA layout.json" or just use the Keymap tab to assign your own keys. Having another keyboard connected can be handy for doing this step.
