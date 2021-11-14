@@ -1,4 +1,4 @@
-### --- Note: When flashing this firmware, be sure to load the VIA keymap and layout files otherwise your keys won't work! Please refer to the sections below. ---
+### --- Note: When flashing this firmware, be sure to load the VIA keymap and layout files otherwise your keys won't work! Please refer to the VIA section below. ---
 
 # Sofle Keyboard
 
