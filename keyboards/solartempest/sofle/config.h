@@ -76,7 +76,27 @@
 	//#define SPLIT_LAYER_STATE_ENABLE
 	//#define SPLIT_LED_STATE_ENABLE
 	//#define SPLIT_MODS_ENABLE
-	#define OLED_LOGO //Enable to print snakey custom logo on slave side, disable to save space.
+	#define OLED_LOGO //Enable to print snakey custom logo on slave side (+108).
+	//#define OLED_NO_SLAVE //Enable for snakey to not render slave OLED (-160).
+#endif
+
+//Haptic feedback settings
+#ifdef HAPTIC_ENABLE
+	#define FB_ERM_LRA 1
+	#define FB_BRAKEFACTOR 3 // For 1x:0, 2x:1, 3x:2, 4x:3, 6x:4, 8x:5, 16x:6, Disable Braking:7
+	#define FB_LOOPGAIN 0 // For  Low:0, Medium:1, High:2, Very High:3
+
+	// Please refer to your datasheet for the optimal setting for your specific motor.
+	#define RATED_VOLTAGE 3
+	#define V_RMS 2.0
+	#define V_PEAK 2.1
+	#define F_LRA 205 //resonance freq
+	
+	#define NO_HAPTIC_PUNCTUATION
+	#define NO_HAPTIC_ALPHA
+	#define NO_HAPTIC_MOD
+	//#define NO_HAPTIC_NUMERIC
+	//#define NO_HAPTIC_NAV
 #endif
 
 // Combo settings
@@ -87,11 +107,11 @@
 
 // Pimoroni trackball settings
 #ifdef POINTING_DEVICE_ENABLE
-	#define PIMORONI_TRACKBALL_ROTATE
-	#define PIMORONI_TRACKBALL_INVERT_Y
 	#define PIMORONI_TRACKBALL_INTERVAL_MS 6 //Default is 8ms
-	//#define PIMORONI_TRACKBALL_INVERT_X
-	//#define PIMORONI_TRACKBALL_CLICK //Not compatible with having mouse keys in keymap. Use trackball_register_button() and trackball_click() in keymap.c instead.
+	//#define PIMORONI_TRACKBALL_ROTATE
+	#define PIMORONI_TRACKBALL_INVERT_Y
+	#define PIMORONI_TRACKBALL_INVERT_X
+	//#define PIMORONI_TRACKBALL_CLICK //Incompatible with keymap mouse keys. Use trackball_register_button() and trackball_click() instead.
 #endif               
 
 

@@ -33,6 +33,10 @@
 	bool was_scrolling = true;	//Remember last state of trackball scrolling
 #endif
 
+#ifdef HAPTIC_ENABLE
+	#include "drivers/haptic/DRV2605L.h"
+#endif
+
 #ifdef RGBLIGHT_ENABLE
 	extern rgblight_config_t rgblight_config; // To pull layer status for RGBLIGHT
 #endif
@@ -123,14 +127,22 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {  //Can skip these
 		}
 	}
 	
-	bool pointing_device_task_user(pimoroni_data* trackball_data) { //Code from Dasky (Thanks!). This corrects the rotate/inversion scrolling issue currently in QMK Master.
-		if (trackball_is_scrolling()) {
-			pimoroni_data temp = *trackball_data;
-			trackball_data->up = temp.down;
-			trackball_data->down = temp.up;
+	#if defined(PIMORONI_TRACKBALL_ROTATE) || defined(PIMORONI_TRACKBALL_INVERT_Y)
+		bool pointing_device_task_user(pimoroni_data* trackball_data) { //Code from Dasky (Thanks!). This corrects the rotate/inversion scrolling issue currently in QMK Master.
+			if (trackball_is_scrolling()) {
+				pimoroni_data temp = *trackball_data;
+				#ifdef PIMORONI_TRACKBALL_ROTATE
+					trackball_data->up = temp.down;
+					trackball_data->down = temp.up;
+				#endif
+				#ifdef PIMORONI_TRACKBALL_INVERT_Y
+					trackball_data->left = temp.right;
+					trackball_data->right = temp.left;
+				#endif
+			}
+			return true;
 		}
-		return true;
-	}
+	#endif
 
 	#if !defined(MOUSEKEY_ENABLE)	//Allows for button clicks on keymap even though mousekeys is not defined.
 		static bool mouse_button_one, trackball_button_one;
@@ -140,16 +152,22 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {  //Can skip these
 		report_mouse_t currentReport = pointing_device_get_report();
 		if (pressed) {
 			currentReport.buttons |= button;
+			#ifdef HAPTIC_ENABLE
+				DRV_pulse(4);
+			#endif
 		} else {
 			currentReport.buttons &= ~button;
 		}
 		pointing_device_set_report(currentReport);
 	}
 	
-	void trackball_click(bool pressed, report_mouse_t* mouse) { //Use for single mouse button and key presses. Click and drag is done with keys elsewhere.
+	void trackball_click(bool pressed, report_mouse_t* mouse) { //Use for single mouse button and key presses. Click and drag is done with keymap.
 		if (pressed) { //trackball pressed
 			//tap_code_delay(KC_A,300); //Use delay as simple debounce for key strokes
 			mouse->buttons |= MOUSE_BTN1;
+			#ifdef HAPTIC_ENABLE
+				DRV_pulse(4);
+			#endif
 		} else {  //released
 			mouse->buttons &= ~MOUSE_BTN1;
 		}
@@ -301,7 +319,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		#    if !defined(MOUSEKEY_ENABLE) //Allow for using mouse buttons in the keymap when mouse keys is not enabled.
 				case KC_MS_BTN1:
 					mouse_button_one = record->event.pressed;
-					trackball_register_button(mouse_button_one | trackball_button_one, MOUSE_BTN1);
+					trackball_button_one = record->event.pressed;
+					//trackball_register_button(mouse_button_one | trackball_button_one, MOUSE_BTN1);
+					trackball_register_button(mouse_button_one, MOUSE_BTN1);
 					break;
 				case KC_MS_BTN2:
 					trackball_register_button(record->event.pressed, MOUSE_BTN2);
@@ -311,7 +331,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 					break;
 		#    endif
 		#endif
-			
+		
 		#ifdef KEYBOARD_PET // KEYBOARD PET STATUS
 			case KC_LCTL:
 			case KC_RCTL:
@@ -395,33 +415,48 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		rgblight_set_layer_state(3, layer_state_cmp(state, 3));
 		rgblight_set_layer_state(4, layer_state_cmp(state, 4));
 		
-		
 		switch(biton32(state)){ // Change all other LEDs based on layer state as well
 			case 0:
 				rgblight_sethsv_noeeprom(50,255,80);
-				if (was_scrolling==true){ //Check if was scrolling when layer was left
-					trackball_set_scrolling(true);
-					run_trackball_cleanup();
-				} else{
-					trackball_set_scrolling(false);
-					run_trackball_cleanup();
-				}
+				#ifdef POINTING_DEVICE_ENABLE
+					if (was_scrolling==true){ //Check if was scrolling when layer was left
+						trackball_set_scrolling(true);
+						run_trackball_cleanup();
+					} else{
+						trackball_set_scrolling(false);
+						run_trackball_cleanup();
+					}
+				#endif
 				break;
 			case 1:
 				rgblight_sethsv_noeeprom(252,255,80);
+				#ifdef HAPTIC_ENABLE
+					DRV_pulse(69);
+				#endif
 				break;
 			case 2:
 				rgblight_sethsv_noeeprom(80,255,80);
+				#ifdef HAPTIC_ENABLE
+					DRV_pulse(37);
+				#endif
 				break;
 			case 3:
 				rgblight_sethsv_noeeprom(118,255,80);
+				#ifdef HAPTIC_ENABLE
+					DRV_pulse(31);
+				#endif
 				break;
 			case 4:
 				rgblight_sethsv_noeeprom(218,255,80);
-				if (was_scrolling==true){ //Check if was scrolling when layer is activated
-					trackball_set_scrolling(false);
-					run_trackball_cleanup();
-				}
+				#ifdef HAPTIC_ENABLE
+					DRV_pulse(7);
+				#endif
+				#ifdef POINTING_DEVICE_ENABLE
+					if (was_scrolling==true){ //Check if was scrolling when layer is activated
+						trackball_set_scrolling(false);
+						run_trackball_cleanup();
+					}
+				#endif
 		  }
 		return state;
 	}
