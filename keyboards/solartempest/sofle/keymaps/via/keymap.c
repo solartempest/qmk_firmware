@@ -18,7 +18,11 @@
 
 #include QMK_KEYBOARD_H
 #include <stdio.h> //This is required for OLED sprintf.
-#include "encoder.c"
+
+#ifdef ENCODER_ENABLE
+	#include "encoder.c"
+#endif
+
 #ifdef OLED_ENABLE
 	//#include "oled.c" //Stock OLED code
 	//Note that the keyboard animations below take a large amount of space!
@@ -30,22 +34,26 @@
 
 #ifdef POINTING_DEVICE_ENABLE
 	#include "drivers/sensors/pimoroni_trackball.h"
-	bool was_scrolling = true;	//Remember last state of trackball scrolling
+	bool was_scrolling = true;	//Remember preferred state of trackball scrolling
 #endif
 
 #ifdef HAPTIC_ENABLE
 	#include "drivers/haptic/DRV2605L.h"
 #endif
 
-#ifdef RGBLIGHT_ENABLE
+#if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_LAYERS)
 	extern rgblight_config_t rgblight_config; // To pull layer status for RGBLIGHT
 #endif
 
+
+//Variables for custom keycodes
 bool is_alt_tab_active = false; // Super Alt Tab Code
 uint16_t alt_tab_timer = 0;
 bool lshift_held = false;	// LShift Backspace Delete whole Word Code
 bool rshift_held = false;	// RShift Backspace Delete whole Word Code
 static uint16_t held_shift = 0;
+
+
 #ifdef VIA_ENABLE
 	enum custom_keycodes { //Use USER 00 instead of SAFE_RANGE for Via. VIA json must include the custom keycode.
 	  ATABF = USER00, 	//Alt tab forwards
@@ -69,7 +77,7 @@ static uint16_t held_shift = 0;
 #endif
 
 
-const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {  //Can skip these layouts to save space when using only VIA.
+const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {  //Can skip these hard-coded layouts to save space when using only VIA (+700).
 /* QWERTY
  * ,-----------------------------------------.                    ,-----------------------------------------.
  * |  `   |   1  |   2  |   3  |   4  |   5  |                    |   6  |   7  |   8  |   9  |   0  |  `   |
@@ -90,8 +98,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {  //Can skip these
   KC_TAB,	KC_A,	KC_S,	KC_D,	KC_F,	KC_G,	KC_MUTE,	KC_NO,	KC_H,	KC_J,	KC_K,	KC_L,	KC_SCLN,	KC_QUOT,
   KC_LSFT,	KC_Z,	KC_X,	KC_C,	KC_V,	KC_B,	KC__VOLDOWN,KC_PGDN,KC_N,	KC_M,	KC_COMM,KC_DOT,	KC_SLSH,	KC_RSFT,
 					KC_LGUI,KC_LALT,KC_LCTRL,MO(2),	KC_ENT,		KC_SPC,	MO(3),	KC_RCTRL,KC_RALT,KC_RGUI
-)
-,
+),
 [1] = LAYOUT(
   KC_PSCR,	KC_5,		KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,							KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_F11,		KC_F4,
   KC_T,		KC_ESC,		KC_Q,		KC_W,		KC_E,		KC_R,		KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_F12,
@@ -112,23 +119,32 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {  //Can skip these
   KC_SLCK,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_WBAK,	KC_LEFT,	KC_DOWN,	KC_RIGHT,	KC_TRNS,	KC_TRNS,
   KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	ATABR,		NML,		KC_CAPS,	KC_PGUP,	KC_TRNS,	KC_PGDN,	KC_TRNS,	KC_TRNS,
 						KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS
+),
+[4] = LAYOUT(
+  KC_TRNS,		KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,							KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,
+  KC_NLCK,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,		KC_TRNS,		KC_TRNS,	KC_TRNS,	KC_TRNS,		KC_TRNS,		KC_TRNS,		KC_TRNS,
+  KC_SLCK,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,
+  KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,		KC_TRNS,		KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,
+						KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS,	KC_TRNS
 )*/
 };
 
 
 #ifdef POINTING_DEVICE_ENABLE
-	void run_trackball_cleanup(void) {	//Code by Drasnha. Sets colour of trackball LED.
+	void run_trackball_cleanup(void) {	//Set colour of trackball LED. Does not require RGBLIGHT_ENABLE if colour shorthands are not used.
+		#ifdef POINTING_DEVICE_ENABLE
 		if (trackball_is_scrolling()) {
 			trackball_set_rgbw(43, 153, 103, 0x00);
 		} else if (trackball_get_precision() != 1.0) {
 			trackball_set_rgbw(0, 27, 199, 0x00);
 		} else {
-			trackball_set_rgbw(RGB_GOLDENROD, 0x00);
+			trackball_set_rgbw(217, 165, 33, 0x00);	//RGB_GOLDENROD in number form. 
 		}
+		#endif
 	}
 	
 	#if defined(PIMORONI_TRACKBALL_ROTATE) || defined(PIMORONI_TRACKBALL_INVERT_Y)
-		bool pointing_device_task_user(pimoroni_data* trackball_data) { //Code from Dasky (Thanks!). This corrects the rotate/inversion scrolling issue currently in QMK Master.
+		bool pointing_device_task_user(pimoroni_data* trackball_data) { //Code from Dasky. This corrects the rotate/inversion scrolling issue currently in QMK Master.
 			if (trackball_is_scrolling()) {
 				pimoroni_data temp = *trackball_data;
 				#ifdef PIMORONI_TRACKBALL_ROTATE
@@ -148,12 +164,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {  //Can skip these
 		static bool mouse_button_one, trackball_button_one;
 	#endif
 
-	void trackball_register_button(bool pressed, enum mouse_buttons button) { //Allows for clicking with mousekey and dragging with trackball.
+	void trackball_register_button(bool pressed, enum mouse_buttons button) { //Register mouse keys for trackball.
 		report_mouse_t currentReport = pointing_device_get_report();
 		if (pressed) {
 			currentReport.buttons |= button;
-			#ifdef HAPTIC_ENABLE
-				DRV_pulse(4);
+			#ifdef HAPTIC_ENABLE	//Haptic feedback when trackball button is pressed
+				DRV_pulse(4);		//sharp_click
 			#endif
 		} else {
 			currentReport.buttons &= ~button;
@@ -161,12 +177,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {  //Can skip these
 		pointing_device_set_report(currentReport);
 	}
 	
-	void trackball_click(bool pressed, report_mouse_t* mouse) { //Use for single mouse button and key presses. Click and drag is done with keymap.
+	void trackball_click(bool pressed, report_mouse_t* mouse) { //Use for mouse buttons. Click+drag is done with keymap and not compatible with trackball click functions.
 		if (pressed) { //trackball pressed
 			//tap_code_delay(KC_A,300); //Use delay as simple debounce for key strokes
 			mouse->buttons |= MOUSE_BTN1;
-			#ifdef HAPTIC_ENABLE
-				DRV_pulse(4);
+			#ifdef HAPTIC_ENABLE	//Haptic feedback when trackball button is pressed
+				DRV_pulse(4);		//sharp_click
 			#endif
 		} else {  //released
 			mouse->buttons &= ~MOUSE_BTN1;
@@ -372,44 +388,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #endif
 
 
-#ifdef RGBLIGHT_ENABLE
-	// RGB Layer Light Settings - Note that this will fix the key switch LED colour and brightness
-	const rgblight_segment_t PROGMEM my_layer0_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 95,255,90}); //Change range for multiple keys with same colour
-	const rgblight_segment_t PROGMEM my_layer1_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 252,255,125}); //Change range for multiple keys with same colour
-	const rgblight_segment_t PROGMEM my_layer2_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 95,255,90}); //Change range for multiple keys with same colour
-	const rgblight_segment_t PROGMEM my_layer3_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 128,255,100}); //Change range for multiple keys with same colour
-	const rgblight_segment_t PROGMEM my_layer4_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 215,255,120}); //Change range for multiple keys with same colour
-	const rgblight_segment_t PROGMEM my_capslock_layer[] = RGBLIGHT_LAYER_SEGMENTS({4, 3, 43,100,170}); //White-left caps lock indication (No dedicated LED)
-	const rgblight_segment_t PROGMEM my_numlock_layer[] = RGBLIGHT_LAYER_SEGMENTS({28, 3, 43,100,170}); //White-right num lock indication (No dedicated LED). Since this indicator is inverted, it must be on the master side of the keyboard to shut off properly when the computer is sleeping.
-	const rgblight_segment_t PROGMEM my_scrollock_layer[] = RGBLIGHT_LAYER_SEGMENTS({55, 3, 43,100,170}); //White-middle-right scroll lock indication (No dedicated LED)
+#if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_LAYERS)
+	//LED Lock keys status indicators are used since the sofle doesn't have dedicated LEDS for this.
+	//Note 1: These will assign static colour and brightness to the LED range specified.
+	//Note 2: Base layer0 is required for lock layers to work, even if range for static LED colours is set to 0,0.
+	const rgblight_segment_t PROGMEM my_layer0_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 95,255,90}); //RGB colour is ignored as range is 0,0.
+	const rgblight_segment_t PROGMEM my_capslock_layer[] = RGBLIGHT_LAYER_SEGMENTS({4, 3, 43,100,170}); //White-left caps lock indication
+	const rgblight_segment_t PROGMEM my_numlock_layer[] = RGBLIGHT_LAYER_SEGMENTS({28, 3, 43,100,170}); //White-right num lock indication. Since this indicator is inverted, it must be on the master side of the keyboard to shut off properly when the computer is sleeping.
+	const rgblight_segment_t PROGMEM my_scrollock_layer[] = RGBLIGHT_LAYER_SEGMENTS({55, 3, 43,100,170}); //White-middle-right scroll lock indication
 	const rgblight_segment_t *const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST( //Lighting layers
-		my_layer0_layer,
-		my_layer1_layer,
-		my_layer2_layer,
-		my_layer3_layer,
-		my_layer4_layer,
-		my_capslock_layer,    //Highest status indicators override other layers
+		my_layer0_layer,	//Base layer with no indications
+		my_capslock_layer,	//Highest status indicators override other layers
 		my_numlock_layer,
 		my_scrollock_layer
 	);
+#endif
 
-
-	void keyboard_post_init_user(void)
+#if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_LAYERS)
+	layer_state_t layer_state_set_user(layer_state_t state)	//Use for layer lighting. This is independent from lock key LED indicators.
 	{
-		rgblight_layers = my_rgb_layers;// Enable the LED layers
-		rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_GRADIENT+8); //Set to static gradient 9
-		layer_move(0); //start on layer 0 to get the lighting activated in all cases. Remove to save a very small amount of space.
-		#ifdef POINTING_DEVICE_ENABLE
-			trackball_set_precision(1.75); //Start trackball with less precision
-			trackball_set_scrolling(true); //Start trackball in scrolling mode
-			run_trackball_cleanup();
-		#endif
-	}
-
-
-	layer_state_t layer_state_set_user(layer_state_t state)
-	{
-		rgblight_set_layer_state(0, layer_state_cmp(state, 0));    // Multiple layers will light up if both kb layers are active
+		rgblight_set_layer_state(0, layer_state_cmp(state, 0));
 		rgblight_set_layer_state(1, layer_state_cmp(state, 1));
 		rgblight_set_layer_state(2, layer_state_cmp(state, 2));
 		rgblight_set_layer_state(3, layer_state_cmp(state, 3));
@@ -430,29 +428,29 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 				break;
 			case 1:
 				rgblight_sethsv_noeeprom(252,255,80);
-				#ifdef HAPTIC_ENABLE
-					DRV_pulse(69);
+				#ifdef HAPTIC_ENABLE	//Set different patterns for haptic feedback layer indication
+					DRV_pulse(69);		//transition_hum_10
 				#endif
 				break;
 			case 2:
 				rgblight_sethsv_noeeprom(80,255,80);
 				#ifdef HAPTIC_ENABLE
-					DRV_pulse(37);
+					DRV_pulse(37);		//lg_dblclick_str
 				#endif
 				break;
 			case 3:
 				rgblight_sethsv_noeeprom(118,255,80);
 				#ifdef HAPTIC_ENABLE
-					DRV_pulse(31);
+					DRV_pulse(31);		//sh_dblclick_med
 				#endif
 				break;
 			case 4:
 				rgblight_sethsv_noeeprom(218,255,80);
 				#ifdef HAPTIC_ENABLE
-					DRV_pulse(7);
+					DRV_pulse(7);		//soft_bump
 				#endif
-				#ifdef POINTING_DEVICE_ENABLE
-					if (was_scrolling==true){ //Check if was scrolling when layer is activated
+				#ifdef POINTING_DEVICE_ENABLE	//Set trackball mouse mode when layer 4 is activated
+					if (was_scrolling==true){	//Check if in scrolling mode when layer was activated
 						trackball_set_scrolling(false);
 						run_trackball_cleanup();
 					}
@@ -460,7 +458,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		  }
 		return state;
 	}
-
 
 	bool led_update_user(led_t led_state)
 	{
@@ -470,3 +467,20 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		return true;
 	}
 #endif
+
+
+void keyboard_post_init_user(void)
+{
+	#ifdef RGBLIGHT_ENABLE
+		rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_GRADIENT+8); //Set to static gradient 9
+	#endif
+	#if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_LAYERS)
+		rgblight_layers = my_rgb_layers;	//Enable LED layer lighting
+	#endif
+	layer_move(0); 						//Start on layer0 by default to set LED colours. Can remove to save a very small amount of space.
+	#ifdef POINTING_DEVICE_ENABLE
+		trackball_set_precision(1.75);	//Start trackball with lower precision mode
+		trackball_set_scrolling(true);	//Start trackball in scrolling mode
+		run_trackball_cleanup();
+	#endif
+}

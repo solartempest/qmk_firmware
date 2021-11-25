@@ -25,7 +25,7 @@
 	// KEYBOARD PET START
 	#define KEYBOARD_PET
 	 
-	// settings
+	// settings for WPM-reactive animations
 	#define MIN_WALK_SPEED 10
 	#define MIN_RUN_SPEED 40
 	 
@@ -181,23 +181,17 @@
 	 
 		// animation
 		void animate_luna(void) {
-	 
 			// jump
 			if (isJumping || !showedJump) {
-	 
 				// clear
 				oled_set_cursor(LUNA_X,LUNA_Y +2);
 				oled_write("     ", false);
-
 				oled_set_cursor(LUNA_X,LUNA_Y -1);
-	 
 				showedJump = true;
 			} else {
-	 
 				// clear
 				oled_set_cursor(LUNA_X,LUNA_Y -1);
 				oled_write("     ", false);
-	 
 				oled_set_cursor(LUNA_X,LUNA_Y);
 			}
 	 
@@ -207,16 +201,12 @@
 			// current status
 			if(isBarking) {
 				oled_write_raw_P(bark[abs(1 - current_frame)], ANIM_SIZE);
-	 
 			} else if(isSneaking) {
 				oled_write_raw_P(sneak[abs(1 - current_frame)], ANIM_SIZE);
-	 
 			} else if(current_wpm_read <= MIN_WALK_SPEED) {
 				oled_write_raw_P(sit[abs(1 - current_frame)], ANIM_SIZE);
-	 
 			} else if(current_wpm_read <= MIN_RUN_SPEED) {
 				oled_write_raw_P(walk[abs(1 - current_frame)], ANIM_SIZE);
-	 
 			} else {
 				oled_write_raw_P(run[abs(1 - current_frame)], ANIM_SIZE);
 			}
@@ -238,7 +228,7 @@
 			oled_write("TMPST", false);
 		 
 			#ifdef OLED_LOGO
-				render_logo(0,7); //Not defining this in config.h will save 112 bytes.
+				render_logo(0,7); //Not defining this in config.h will save space (+112).
 			#endif
 			
 			/* wpm counter */
