@@ -38,6 +38,7 @@ bool is_stretch_time = false;
 uint16_t stretch_timer = 0;
 uint16_t stretch_minutes = 0;
 
+
 #ifdef VIA_ENABLE
 	enum custom_keycodes { //Use USER 00 instead of SAFE_RANGE for Via. VIA json must include the custom keycode.
 	  ATABF = USER00,	//Alt tab forwards
@@ -206,7 +207,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 
-
 #ifdef ENCODER_ENABLE
 	static uint8_t  encoder_state[9] = {0};
 	static keypos_t encoder_ccw[9] = {{2, 0}, {2, 1}, {2, 2}, {11, 0}, {11, 1}, {11, 2}, {11, 3}, {5, 3}, {8, 3}};
@@ -255,7 +255,6 @@ void matrix_scan_user(void) {
       is_alt_tab_active = false;
     }
   }
-  
     
   #ifdef RGBLIGHT_ENABLE //Stretch timer code
 	  if (is_stretch_active && !is_stretch_time) {
@@ -263,7 +262,7 @@ void matrix_scan_user(void) {
 			stretch_minutes++;
 			stretch_timer = timer_read();
 		}
-		if (stretch_minutes > 30) { //Change RGB animation effect after set number of minutes.
+		if (stretch_minutes > 30) { //Change RGB animation effect after set number of minutes. 30 minutes is a good interval.
 		  rgblight_set_effect_range(0, 42);
 		  rgblight_mode_noeeprom(RGBLIGHT_MODE_SNAKE);
 		  is_stretch_time = true;
@@ -271,7 +270,6 @@ void matrix_scan_user(void) {
 		}
 	  }
   #endif
-  
   
   encoder_action_unregister();
   #ifdef RGBLIGHT_ENABLE //Add rotation animations underneath rotary encoders when turning
@@ -294,9 +292,6 @@ void matrix_scan_user(void) {
 		if(encoder_effect){
 			rgblight_set_effect_range(0, 42);
 			rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_GRADIENT+8);
-			if(is_stretch_active){ //Maintain orange LED to indicate stretch timer is still on.
-				rgblight_sethsv_at(0,230,100,40);
-			}
 		}
 		is_encoder1_rotate = false;
 		is_encoder6_rotate = false;
@@ -307,6 +302,12 @@ void matrix_scan_user(void) {
 		is_encoder6_rotate = false;
 		is_encoder7_rotate = false;
 	  }
+  
+	if(!is_stretch_time){	//Update LED status indicators when stretch animation is not playing.
+		if(is_stretch_active==1) {
+			rgblight_sethsv_at(0,230,100,40); //Set LED to orange to indicate timer is on
+			}
+	}
   #endif
 }
 
@@ -364,7 +365,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		  if (record->event.pressed) {
 			is_stretch_active ^= 1;
 			stretch_timer = timer_read();
-			//rgblight_sethsv_at(75,215,80,41);
 			if(is_stretch_time==1) { //Check if it is time to stretch, then dismiss the animation.
 				rgblight_set_effect_range(0, 42);
 				rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_GRADIENT+8);
@@ -401,7 +401,6 @@ const rgblight_segment_t PROGMEM my_layer3_layer[] = RGBLIGHT_LAYER_SEGMENTS({4,
 const rgblight_segment_t PROGMEM my_capslock_layer[] = RGBLIGHT_LAYER_SEGMENTS({4, 2, 43,100,160}); //White-left caps lock indication (No dedicated LED)
 const rgblight_segment_t PROGMEM my_numlock_layer[] = RGBLIGHT_LAYER_SEGMENTS({8, 2, 43,100,150}); //White-right num lock indication (No dedicated LED)
 const rgblight_segment_t PROGMEM my_scrollock_layer[] = RGBLIGHT_LAYER_SEGMENTS({6, 2, 43,100,160}); //White-middle scroll lock indication (No dedicated LED)
-
 
 const rgblight_segment_t *const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST( //Lighting layers
     my_layer0_layer,
