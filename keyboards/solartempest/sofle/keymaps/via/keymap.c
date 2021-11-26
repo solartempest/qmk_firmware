@@ -392,12 +392,20 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 	//LED Lock keys status indicators are used since the sofle doesn't have dedicated LEDS for this.
 	//Note 1: These will assign static colour and brightness to the LED range specified.
 	//Note 2: Base layer0 is required for lock layers to work, even if range for static LED colours is set to 0,0.
-	const rgblight_segment_t PROGMEM my_layer0_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 95,255,90}); //RGB colour is ignored as range is 0,0.
+	const rgblight_segment_t PROGMEM my_layer0_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 95,255,90}); //Static RGB colour is ignored as range is 0,0.
+	const rgblight_segment_t PROGMEM my_layer1_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 252,255,125});
+	const rgblight_segment_t PROGMEM my_layer2_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 95,255,90});
+	const rgblight_segment_t PROGMEM my_layer3_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 128,255,100});
+	const rgblight_segment_t PROGMEM my_layer4_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 215,255,120});
 	const rgblight_segment_t PROGMEM my_capslock_layer[] = RGBLIGHT_LAYER_SEGMENTS({4, 3, 43,100,170}); //White-left caps lock indication
 	const rgblight_segment_t PROGMEM my_numlock_layer[] = RGBLIGHT_LAYER_SEGMENTS({28, 3, 43,100,170}); //White-right num lock indication. Since this indicator is inverted, it must be on the master side of the keyboard to shut off properly when the computer is sleeping.
 	const rgblight_segment_t PROGMEM my_scrollock_layer[] = RGBLIGHT_LAYER_SEGMENTS({55, 3, 43,100,170}); //White-middle-right scroll lock indication
 	const rgblight_segment_t *const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST( //Lighting layers
 		my_layer0_layer,	//Base layer with no indications
+		my_layer1_layer,
+		my_layer2_layer,
+		my_layer3_layer,
+		my_layer4_layer,
 		my_capslock_layer,	//Highest status indicators override other layers
 		my_numlock_layer,
 		my_scrollock_layer
