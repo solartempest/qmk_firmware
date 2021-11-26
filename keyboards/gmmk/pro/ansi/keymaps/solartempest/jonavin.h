@@ -32,15 +32,13 @@ enum custom_user_layers {
 // KEYCODES
 enum custom_user_keycodes {
   KC_00 = SAFE_RANGE,
-  ENCFUNC,
-  KC_WINLCK,    //Toggles Win key on and off
-  RGB_TOI,      // Timeout idle time up
-  RGB_TOD,      // Timeout idle time down
-  RGB_NITE,      // Turns off all rgb but allow rgb indicators to work
-  NMR, //Move window to monitor on right
-  NML, //Move window to monitor on left
-  SPAMARROW, //Spam F24.
-  TEAMSMUTE //MS Teams mute shortcut and simple LED status
+  ENCFUNC,		//Encoder functions
+  KC_WINLCK,	//Toggles Win key on and off
+  RGB_TOI,		//Timeout idle time up
+  RGB_TOD,		//Timeout idle time down
+  RGB_NITE,		//Turns off all rgb but allow rgb indicators to work
+  NMR,			//Move window to monitor on right
+  NML			//Move window to monitor on left
 };
 
 #define KC_CAD	LALT(LCTL(KC_DEL))

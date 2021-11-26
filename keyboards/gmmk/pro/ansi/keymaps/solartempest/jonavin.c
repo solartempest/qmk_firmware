@@ -20,10 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include QMK_KEYBOARD_H
 #include "jonavin.h"
 
-bool spam_arrow;
-uint16_t spam_timer = false;
-uint16_t spam_interval = 1000; // (1000ms == 1s)
-bool teams_muted;
 
 #ifdef TD_LSFT_CAPSLOCK_ENABLE
   // Tap once for shift, twice for Caps Lock but only if Win Key in not disabled
@@ -108,10 +104,6 @@ void matrix_scan_user(void) {
 		timeout_tick_timer();
 		matrix_scan_keymap();
 	#endif
-	if (spam_arrow && timer_elapsed(spam_timer) >= spam_interval) {
-		spam_timer = timer_read();
-		tap_code(KC_F24);
-	}
 }
 
 
@@ -259,25 +251,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 			unregister_code(KC_LEFT);
 			unregister_code(KC_LWIN);
 			unregister_code(KC_LSFT);
-		  }
-		  return true;
-		  
-		case SPAMARROW: // Moves arrow up and down
-		  if (record->event.pressed) { 
-			spam_arrow ^= 1; 
-			spam_timer = timer_read();
-		  }
-		  return false;
-		  
-		case TEAMSMUTE:	//Mute MS teams and simply change LED for key 1 colour
-		  if (record->event.pressed) {
-			register_code(KC_LCTRL);
-			register_code(KC_LSFT);
-			register_code(KC_M);
-			unregister_code(KC_M);
-			unregister_code(KC_LSFT);
-			unregister_code(KC_LCTRL);
-			teams_muted ^= 1; 
 		  }
 		  return true;
 		

@@ -1,20 +1,21 @@
-VIA_ENABLE = yes
-MOUSEKEY_ENABLE = yes
-BOOTMAGIC_ENABLE = lite     # Enable Bootmagic Lite
+VIA_ENABLE = yes						# VIA
 
-TD_LSFT_CAPSLOCK_ENABLE = yes
-IDLE_TIMEOUT_ENABLE = yes
-STARTUP_NUMLOCK_ON = yes
-ENCODER_DEFAULTACTIONS_ENABLE = yes
+MOUSEKEY_ENABLE = yes					# Mouse keys for keymap
+BOOTMAGIC_ENABLE = lite   				# Enable Bootmagic Lite
+LTO_ENABLE = no							# MCU has 256kB space - 4kB for the EEPROM
 
-LEADER_ENABLE = no			# Leader keys
-COMBO_ENABLE = no			# Combo keys
-TAP_DANCE_ENABLE = yes
+TD_LSFT_CAPSLOCK_ENABLE = yes			# Enable Jonavin's custom left shift keycode. Requires Tap Dance.
+TAP_DANCE_ENABLE = yes					# Tap Dance
+IDLE_TIMEOUT_ENABLE = yes				# Turns off RGB after idle timeout
+STARTUP_NUMLOCK_ON = yes				# Turns numlock on by default
+ENCODER_DEFAULTACTIONS_ENABLE = yes		# Enable Jonavin's custom encoder actions
 
-LTO_ENABLE = no				# MCU has 256kB space - 4kB for the EEPROM.
+LEADER_ENABLE = no						# Leader keys
+COMBO_ENABLE = no						# Combo keys
+NKRO_ENABLE = yes						# NKRO
 
 
-SRC += jonavin.c
+SRC += jonavin.c						# Includes code for Jonavin's custom functions
 ifeq ($(strip $(ENCODER_DEFAULTACTIONS_ENABLE)), yes)
     OPT_DEFS += -DENCODER_DEFAULTACTIONS_ENABLE
 endif
