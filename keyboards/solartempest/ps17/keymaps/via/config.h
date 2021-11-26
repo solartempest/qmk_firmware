@@ -18,5 +18,5 @@
 
 #pragma once
 
-// Set 10 layers for VIA
+// Set number of layers for VIA (+30 per layer)
 #define DYNAMIC_KEYMAP_LAYER_COUNT 10

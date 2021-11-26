@@ -36,18 +36,34 @@
 	#define MATRIX_ROWS 11 //Numpad actually has 6 rows. 5 rows were added for underglow RGB matrix to work together
 #endif
 #define MATRIX_COLS 4
+#define MATRIX_ROW_PINS { F0, B4, B5, B6, C6, C7 } //Rotary encoder SPST is on F0,F7
+#define MATRIX_COL_PINS { F6, F7, D3, D6 }
+#define DIODE_DIRECTION COL2ROW
+#define DEBOUNCE 5 //Default is 5, 0 if not needed.
 
 // Encoder matrix
 #define ENCODERS_PAD_A { D1 }
 #define ENCODERS_PAD_B { D2 }
-//#define ENCODER_DIRECTION_FLIP
 
-#define MATRIX_ROW_PINS { F0, B4, B5, B6, C6, C7 } //Rotary encoder SPST is on F0,F7
-#define MATRIX_COL_PINS { F6, F7, D3, D6 }
-#define UNUSED_PINS
+// NKRO Settings
+#ifdef NKRO_ENABLE
+	#define FORCE_NKRO //Force NKRO if enabled.
+#endif
 
-// COL2ROW or ROW2COL
-#define DIODE_DIRECTION COL2ROW
+// Combo settings
+#ifdef COMBO_ENABLE
+	#define COMBO_COUNT 6 //Number of tap combos used
+	#define COMBO_TERM 400 //Default combo time is 200ms
+#endif
+
+// Tapping settings
+#define TAP_CODE_DELAY 10
+#define TAPPING_TOGGLE 2 //Tap TT twice to toggle layer
+#define TAPPING_TERM 160 //Tapping duration in ms
+
+// Mechanical locking support. Use KC_LCAP, KC_LNUM or KC_LSCR instead in keymap.
+#define LOCKING_SUPPORT_ENABLE
+#define LOCKING_RESYNC_ENABLE // Locking resynchronize hack
 
 // For LED status indicators
 #define LED_NUM_LOCK_PIN D0
@@ -57,16 +73,16 @@
 
 #define RGB_DI_PIN B7
 #ifdef RGBLIGHT_ENABLE
-	#define RGBLED_NUM 28 // 17 key + 11 underglow for RGBLIGHT
+	#define RGBLED_NUM 28 //17 key + 11 underglow for RGBLIGHT
 	#define RGBLIGHT_HUE_STEP 8
 	#define RGBLIGHT_SAT_STEP 8
 	#define RGBLIGHT_VAL_STEP 8
-	#define RGBLIGHT_DEFAULT_VAL 40 // default brightness on clearing EEPROM
-	#define RGBLIGHT_LIMIT_VAL 180 // brightness level max is 255
-	#define RGBLIGHT_LAYERS
+	#define RGBLIGHT_DEFAULT_VAL 40 //Default brightness on clearing EEPROM
+	#define RGBLIGHT_LIMIT_VAL 180 //Brightness level max is 255
+	#define RGBLIGHT_LAYERS //Enable layer light indicators
 	#define RGBLIGHT_LAYERS_OVERRIDE_RGB_OFF
-	#define RGBLIGHT_SLEEP //  if defined, RGB lighting off when host is sleeping
-	#define RGBLIGHT_ANIMATIONS
+	#define RGBLIGHT_SLEEP  	//Turn off LEDs when computer sleeping (+72)
+	#define RGBLIGHT_ANIMATIONS //Very memory intensive (+2604)
 
 	//RGB LED Conversion macro from physical array to electric array
 	//First section is the LED matrix, second section is the electrical wiring order, and the third section is the desired mapping
@@ -93,7 +109,7 @@
 		27, 26, 25, 24,    23  )
 #endif
 
-#ifdef RGB_MATRIX_ENABLE // For dynamic/reactive RGB Matrix effects
+#ifdef RGB_MATRIX_ENABLE // For reactive RGB Matrix effects
 	#define DRIVER_LED_TOTAL 28 // The number of LEDs connected for matrix, 17 key + 11 underglow
 	#define RGB_MATRIX_CENTER { 126, 126 };
 	#define RGB_MATRIX_KEYPRESSES
@@ -130,16 +146,3 @@
 	#define DISABLE_RGB_MATRIX_SOLID_SPLASH
 	#define DISABLE_RGB_MATRIX_SOLID_MULTISPLASH
 #endif
-
-/* Set 0 if debouncing isn't needed */
-#define DEBOUNCE 5
-
-/* Mechanical locking support. Use KC_LCAP, KC_LNUM or KC_LSCR instead in keymap */
-#define LOCKING_SUPPORT_ENABLE
-/* Locking resynchronize hack */
-#define LOCKING_RESYNC_ENABLE
-
-#define COMBO_COUNT 6 //Number of tap combos used
-#define COMBO_TERM 400 //Default combo time is 200ms
-
-#define TAPPING_TERM 200 //Tap dance time

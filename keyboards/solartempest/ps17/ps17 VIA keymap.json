@@ -34,6 +34,11 @@
       "name": "Teams Muted",
       "title": "Simply Change LED of 1 to show if muted or not",
       "shortName": "TM"
+    },
+    {
+      "name": "Stretch Timer",
+      "title": "Activate Stretch Timer",
+      "shortName": "STRT"
     }
   ],
   "layouts": 

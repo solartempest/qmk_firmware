@@ -15,11 +15,12 @@ For detailed instructions on using VIA and flashing, please refer to the section
 -   Remappable rotary encoder controls volume up/down/mute.
 -   Allows for remapping of per-layer rotary encoder functions in VIA.
 -   VIA support included by default.
--   RGB underglow and matrix support and remapped to physical locations (nicer gradient and effects).
+-   RGB underglow and matrix support and remapped to physical locations for nicer gradient and effects.
 -   Adds custom layer lighting with custom gradients for each.
 -   Custom macro key in VIA for Super Alt Tab, which is fully compatible with rotary encoders.
 -   Custom macro key in VIA for moving windows to other monitors in Windows, which is fully compatible with rotary encoders.
--   Adds key combo functionality for backspace, delete, and arrow keys.
+-   Custom macro key in VIA for Stretch Timer. It animates the LEDs after 30 minutes as a reminder to stand up and stretch. Push to dismiss.
+-   Adds key combo functionality for backspace, delete, and arrow keys. Plus+8/9 along with Enter+4/5/6/8.
 
 ## Make and Flashing
 

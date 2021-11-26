@@ -26,11 +26,17 @@
 bool is_alt_tab_active = false; // Super Alt Tab Code
 uint16_t alt_tab_timer = 0;
 
-bool spam_arrow;
+bool spam_arrow;				// Spam F24 or other keys like arrows Code
 uint16_t spam_timer = false;
-uint16_t spam_interval = 1000; // (1000ms == 1s)
+uint16_t spam_interval = 1000;	// (1000ms == 1s)
 
-bool teams_muted;
+bool teams_muted;				// Teams muted simple LED indicator 
+
+bool is_stretch_active = false; // Stretch Timer Code
+bool is_stretch_time = false;
+uint16_t stretch_timer = 0;
+uint16_t stretch_minutes = 0;
+
 #ifdef VIA_ENABLE
 	enum custom_keycodes { //Use USER 00 instead of SAFE_RANGE for Via. VIA json must include the custom keycode.
 	  ATABF = USER00, //Alt tab forwards
@@ -38,7 +44,8 @@ bool teams_muted;
 	  NMR, //Move window to monitor on right
 	  NML, //Move window to monitor on left
 	  SPAMARROW, //Spam arrows. Updated to send F24 instead, which is more convenient.
-	  TEAMSMUTE //MS Teams mute shortcut and simple LED status
+	  TEAMSMUTE, //MS Teams mute shortcut and simple LED status
+	  STRT				//Stretch Timer
 	};
 #else
 	enum custom_keycodes { //Use USER 00 instead of SAFE_RANGE for Via. VIA json must include the custom keycode.
@@ -47,7 +54,8 @@ bool teams_muted;
 	  NMR, //Move window to monitor on right
 	  NML, //Move window to monitor on left
 	  SPAMARROW, //Spam arrows. Updated to send F24 instead, which is more convenient.
-	  TEAMSMUTE //MS Teams mute shortcut and simple LED status
+	  TEAMSMUTE, //MS Teams mute shortcut and simple LED status
+	  STRT				//Stretch Timer
 	};
 #endif
 
@@ -76,7 +84,7 @@ bool teams_muted;
 	};
 #endif
 
-#ifdef TAP_DANCE_ENABLE// Tap Dance definitions. Not VIA compatible.
+#ifdef TAP_DANCE_ENABLE// Tap Dance definitions. Not compatible with VIA.
 	enum {
 		TD_MINUS_NUMLOCK,
 	};
@@ -185,22 +193,57 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 
-void matrix_scan_user(void) { //run whenever user matrix is scanned
-  if (is_alt_tab_active) {
+void matrix_scan_user(void) {
+  if (is_alt_tab_active) {		//Super alt tab code
     if (timer_elapsed(alt_tab_timer) > 1000) {
       unregister_code(KC_LALT);
       is_alt_tab_active = false;
     }
   }
   if (spam_arrow && timer_elapsed(spam_timer) >= spam_interval) {
-    spam_timer = timer_read();
+    spam_timer = timer_read();	//Spam arrow code
     tap_code(KC_F24);
   }
+  
+  #ifdef RGBLIGHT_ENABLE
+	if (is_stretch_active && !is_stretch_time) { //Stretch timer code
+		if(timer_elapsed(stretch_timer)>60000) { //1 minute in ms has passed. Timer is uint16 max.
+			stretch_minutes++;
+			stretch_timer = timer_read();
+		}
+		if (stretch_minutes > 30) { //Change RGB animation effect after set number of minutes. 30 minutes is a good interval.
+		  rgblight_set_effect_range(0, 28);
+		  rgblight_mode_noeeprom(RGBLIGHT_MODE_SNAKE);
+		  is_stretch_time = true;
+		  stretch_minutes = 0;
+		}
+	}
+	
+	if(!is_stretch_time){	//Update LED status indicators when stretch animation is not playing.
+		if(is_stretch_active==1) {
+			rgblight_sethsv_at(0,230,100,8); //Set LED to orange to indicate timer is on
+			rgblight_sethsv_at(0,230,100,9); //Set LED to orange to indicate timer is on
+			rgblight_sethsv_at(0,230,100,13); //Set LED to orange to indicate timer is on
+			}
+		  
+		if(teams_muted==1) { //Check and display teamsmuted status
+			rgblight_sethsv_at(15,255,120,18);
+			rgblight_sethsv_at(15,255,120,22);
+			}
+
+		if(spam_arrow==1) { //Change LED colour on bottom row and underglow to orange to indicate on
+			rgblight_sethsv_at(15,255,120,24);
+			rgblight_sethsv_at(15,255,120,25);
+			rgblight_sethsv_at(15,255,120,26);
+			rgblight_sethsv_at(15,255,120,27);
+			}
+		}
+  #endif
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 	switch (keycode) { //For keycode overrides
-		case ATABF:	//Alt tab forwards
+		case ATABF:	//Super alt tab forwards
 		  if (record->event.pressed) {
 			if (!is_alt_tab_active) {
 			  is_alt_tab_active = true;
@@ -212,7 +255,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 			unregister_code(KC_TAB);
 		  }
 		  return true;
-		case ATABR:	//Alt tab reverse
+		case ATABR:	//Super alt tab reverse
 		  if (record->event.pressed) {
 			if (!is_alt_tab_active) {
 			  is_alt_tab_active = true;
@@ -248,26 +291,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		  }
 		  return true;
 		  
-		case SPAMARROW: // Moves arrow up and down
+		case SPAMARROW: // Spam F24 or other keys like arrows
 		  if (record->event.pressed) { 
 			spam_arrow ^= 1; 
 			spam_timer = timer_read();
-			if(spam_arrow==1) { //Change LED colour on bottom row and underglow to orange to indicate on
-				rgblight_sethsv_at(15,255,120,24);
-				rgblight_sethsv_at(15,255,120,25);
-				rgblight_sethsv_at(15,255,120,26);
-				rgblight_sethsv_at(15,255,120,27);
-				}
-			else {
-				rgblight_sethsv_at(180,255,120,24); //Set LEDs back to purple, assuming on that coloured layer
-				rgblight_sethsv_at(180,255,120,25);
-				rgblight_sethsv_at(180,255,120,26);
-				rgblight_sethsv_at(180,255,120,27);
-				}
+			#ifdef RGBLIGHT_ENABLE
+				if(spam_arrow==1) { //Change LED colour on bottom row and underglow to orange to indicate on
+					rgblight_sethsv_at(15,255,120,24);
+					rgblight_sethsv_at(15,255,120,25);
+					rgblight_sethsv_at(15,255,120,26);
+					rgblight_sethsv_at(15,255,120,27);
+					}
+				else {
+					rgblight_set_effect_range(0, 28);
+					rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_GRADIENT+8); //Set back to layer colours
+					}
+			#endif
 		  }
 		  return false;
 		  
-		case TEAMSMUTE:	//Mute MS teams and simply change LED for key 1 colour
+		case TEAMSMUTE:	//Mute MS teams shortcut and simply change LED for key 1 colour
 		  if (record->event.pressed) {
 			register_code(KC_LCTRL);
 			register_code(KC_LSFT);
@@ -276,23 +319,60 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 			unregister_code(KC_LSFT);
 			unregister_code(KC_LCTRL);
 			teams_muted ^= 1; 
-			if(teams_muted==1) { //Change LED colour on LEDs for key 1 and underglow to orange to indicate muted
-				rgblight_sethsv_at(15,255,120,18);
-				rgblight_sethsv_at(15,255,120,22);
-				}
-			else {
-				rgblight_sethsv_at(175,255,120,18); //Set LEDs back to violet, assuming on that coloured layer
-				rgblight_sethsv_at(175,255,120,22);
-				}
+			#ifdef RGBLIGHT_ENABLE
+				if(teams_muted==1) { //Change LED colour on LEDs for key 1 and underglow to orange to indicate muted
+					rgblight_sethsv_at(15,255,120,18);
+					rgblight_sethsv_at(15,255,120,22);
+					}
+				else {
+					rgblight_sethsv_at(175,255,120,18); //Set LEDs back to violet, assuming on that coloured layer
+					rgblight_sethsv_at(175,255,120,22);
+					}
+			#endif
 		  }
 		  return true;
+		  
+		  
+		case STRT:	//Stretch timer
+		  if (record->event.pressed) {
+			#ifdef RGBLIGHT_ENABLE
+				is_stretch_active ^= 1;
+				stretch_timer = timer_read();
+				//rgblight_sethsv_at(75,215,80,41);
+				if(is_stretch_time==1) { //Check if it is time to stretch, then dismiss the animation.
+					rgblight_set_effect_range(0, 28);
+					rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_GRADIENT+8);
+					rgblight_sethsv_at(0,230,100,8); //Set LED to orange to indicate timer is on
+					rgblight_sethsv_at(0,230,100,9); //Set LED to orange to indicate timer is on
+					rgblight_sethsv_at(0,230,100,13); //Set LED to orange to indicate timer is on
+					is_stretch_active = 1;
+					is_stretch_time = 0;
+					stretch_minutes = 0;
+					}
+				else if(is_stretch_active==1) {
+					rgblight_set_effect_range(0, 28);
+					rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_GRADIENT+8);
+					rgblight_sethsv_at(0,230,100,8); //Set LED to orange to indicate timer is on
+					rgblight_sethsv_at(0,230,100,9); //Set LED to orange to indicate timer is on
+					rgblight_sethsv_at(0,230,100,13); //Set LED to orange to indicate timer is on
+					is_stretch_time = 0;
+					stretch_minutes = 0;
+					}
+				else {
+					rgblight_set_effect_range(0, 28);
+					rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_GRADIENT+8); //Set back to layer colours -- CHECK LAYERS RESET LED STATUS
+					is_stretch_time = 0;
+					stretch_minutes = 0;
+					}
+			#endif
+		  }
+		  return false;
 	}
 	return true;
 }
 
 
-
-void keyboard_post_init_user(void) {	//run as last task in keyboard init
+void keyboard_post_init_user(void) {
   #ifdef RGB_MATRIX_ENABLE
     //NOTE 1: Layer lighting doesn't work in RGB matrix mode
 	//NOTE 2: VIA lighting tab doesn't work and might crash in RGB matrix mode
@@ -329,7 +409,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 	switch(biton32(state)){ // Change all other LEDs based on layer state as well
 		case 0:
 			rgblight_sethsv_noeeprom(50,255,100);
-			//You can selectively decrease certain LEDs if you are have a clear acrylic case and the shine-through bothers you. Rgblight_sethsv_at() can be used here for those LEDs (0, 2, 4, 14, and 23). Otherwise some black tape on the acrylic plate or foam underneath the FR4 will do the trick.
+			//You can selectively decrease certain LEDs if you are have a clear acrylic case and the shine-through is bothersome. Rgblight_sethsv_at() can be used here for those LEDs (0, 2, 4, 14, and 23). Otherwise some black tape on the acrylic plate or foam underneath the FR4 plate will do the trick.
 			break;
 		case 1:
 			rgblight_sethsv_noeeprom(5,255,100);
