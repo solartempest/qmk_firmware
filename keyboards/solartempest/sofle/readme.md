@@ -48,6 +48,7 @@ Build guide and log is available here: [SofleKeyboard build log/guide](https://j
 -   Supports Pimoroni Haptic Bzzz installed on master side.
 -	Different vibrations when layers are activated.
 -	Provides tactile feedback when trackball is clicked or mouse keys are used.
+-	Tactile feedback for specific keys on gaming layer.
 
 ### Tap and Other Features:
 -   Push left-shift + backspace to delete whole words. Right-shift + backspace to delete whole words in the opposite direction.

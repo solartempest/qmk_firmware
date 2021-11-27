@@ -332,7 +332,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 						run_trackball_cleanup();
 						break;
 					}
-		#    if !defined(MOUSEKEY_ENABLE) //Allow for using mouse buttons in the keymap when mouse keys is not enabled.
+		#if !defined(MOUSEKEY_ENABLE) //Allow for using mouse buttons in the keymap when mouse keys is not enabled.
 				case KC_MS_BTN1:
 					mouse_button_one = record->event.pressed;
 					trackball_button_one = record->event.pressed;
@@ -345,7 +345,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 				case KC_MS_BTN3:
 					trackball_register_button(record->event.pressed, MOUSE_BTN3);
 					break;
-		#    endif
+		#endif
 		#endif
 		
 		#ifdef KEYBOARD_PET // KEYBOARD PET STATUS
@@ -366,6 +366,22 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 				}
 				return true;
 		#endif
+		
+		#ifdef HAPTIC_ENABLE	//Set different patterns for keys on certain layers. In this case it is for gaming feedback.
+			case KC_G:
+				if (record->event.pressed && (get_highest_layer(layer_state)==1)) {
+					DRV_pulse(50);		//buzz_40
+				}
+			case KC_R:
+				if (record->event.pressed && (get_highest_layer(layer_state)==1)) {
+					DRV_pulse(52);		//pulsing_strong
+				}
+			case KC_F:
+				if (record->event.pressed && (get_highest_layer(layer_state)==1)) {
+					DRV_pulse(49);		//buzz_60
+				}
+		#endif
+		
 		}
 	return true;
 }
