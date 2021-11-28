@@ -63,8 +63,11 @@
 #define NO_ACTION_FUNCTION
 
 // Disabled to save space
-#define NO_ACTION_ONESHOT //Save 244 bytes (-244).
-#define NO_RESET //Save 40 bytes (-40).
+#define NO_ACTION_ONESHOT		//Save 244 bytes (-244).
+#define NO_RESET				//Save 40 bytes (-40).
+#undef LOCKING_SUPPORT_ENABLE	//For MX lock keys only.
+#undef LOCKING_RESYNC_ENABLE	//For MX lock keys only.
+#define LAYER_STATE_8BIT		//For less than 8 bits worth of layers.
 
 // Encoder support
 #define ENCODERS_PAD_A { F5 }

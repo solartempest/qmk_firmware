@@ -168,9 +168,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {  //Can skip these
 		report_mouse_t currentReport = pointing_device_get_report();
 		if (pressed) {
 			currentReport.buttons |= button;
-			#ifdef HAPTIC_ENABLE	//Haptic feedback when trackball button is pressed
+			/*#ifdef HAPTIC_ENABLE	//Haptic feedback when trackball button is pressed
 				DRV_pulse(4);		//sharp_click
-			#endif
+			#endif*/
 		} else {
 			currentReport.buttons &= ~button;
 		}
@@ -356,6 +356,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 				} else {
 					isSneaking = false;
 				}
+				#ifdef HAPTIC_ENABLE	//Set different patterns for keys on certain layers. In this case it is for gaming feedback.
+					if (record->event.pressed && (get_highest_layer(layer_state)==1)) {
+						DRV_pulse(51);		//buzz_20
+					}
+				#endif
 				return true;
 			case KC_SPC:
 				if (record->event.pressed) { //Pet jumps when enter is pressed.
