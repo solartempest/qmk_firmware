@@ -17,7 +17,6 @@
  */
 
 #include QMK_KEYBOARD_H
-#include <stdio.h> //This is required for OLED sprintf.
 
 #ifdef ENCODER_ENABLE
 	#include "encoder.c"
@@ -26,14 +25,16 @@
 #ifdef OLED_ENABLE
 	//#include "oled.c" //Stock OLED code
 	//Note that the keyboard animations below take a large amount of space!
-		//#include "bongocat.c" //OLED code for Bongocat, original code by foureight84. Disable RGBLIGHT to make enough space.
+		//#include "bongocat.c" //OLED code for Bongocat, original code by foureight84.
 		//#include "luna.c" //OLED code for Luna, original code by Hellsingcoder and adapted by Jackasaur.
 		//#include "snakey.c" //OLED code for Snakey, customized from Luna. If not used, do not use OLED_LOGO in config.h.
+		//#include <stdio.h> //This is required for OLED sprintf (should not be required anymore since sprintf removed from my code).
 		#include "snakey_minimal.c" //OLED code for Snakey, without WPM/related animations to save space. If not used, do not use OLED_LOGO in config.h.
 #endif
 
 #ifdef POINTING_DEVICE_ENABLE
-	#include "drivers/sensors/pimoroni_trackball.h"
+	bool trackball_is_scrolling = true;		//Default mode is scrolling
+	bool trackball_is_precision = false;	//Default mode is less precise
 	bool was_scrolling = true;	//Remember preferred state of trackball scrolling
 #endif
 
@@ -47,8 +48,10 @@
 
 
 //Variables for custom keycodes
-bool is_alt_tab_active = false; // Super Alt Tab Code
-uint16_t alt_tab_timer = 0;
+#ifdef SUPER_ALT_TAB_ENABLE
+	bool is_alt_tab_active = false; // Super Alt Tab Code
+	uint16_t alt_tab_timer = 0;
+#endif
 bool lshift_held = false;	// LShift Backspace Delete whole Word Code
 bool rshift_held = false;	// RShift Backspace Delete whole Word Code
 static uint16_t held_shift = 0;
@@ -133,74 +136,72 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {  //Can skip these
 #ifdef POINTING_DEVICE_ENABLE
 	void run_trackball_cleanup(void) {	//Set colour of trackball LED. Does not require RGBLIGHT_ENABLE if colour shorthands are not used.
 		#ifdef POINTING_DEVICE_ENABLE
-		if (trackball_is_scrolling()) {
-			trackball_set_rgbw(43, 153, 103, 0x00);
-		} else if (trackball_get_precision() != 1.0) {
-			trackball_set_rgbw(0, 27, 199, 0x00);
+		if (trackball_is_scrolling) {
+			pimoroni_trackball_set_rgbw(43, 153, 103, 0x00);
+		} else if (!trackball_is_precision) {
+			pimoroni_trackball_set_rgbw(0, 27, 199, 0x00);
 		} else {
-			trackball_set_rgbw(217, 165, 33, 0x00);	//RGB_GOLDENROD in number form. 
+			pimoroni_trackball_set_rgbw(217, 165, 33, 0x00);	//RGB_GOLDENROD in number form. 
 		}
 		#endif
 	}
 	
-	#if defined(PIMORONI_TRACKBALL_ROTATE) || defined(PIMORONI_TRACKBALL_INVERT_Y)
-		bool pointing_device_task_user(pimoroni_data* trackball_data) { //Code from Dasky. This corrects the rotate/inversion scrolling issue currently in QMK Master.
-			if (trackball_is_scrolling()) {
-				pimoroni_data temp = *trackball_data;
-				#ifdef PIMORONI_TRACKBALL_ROTATE
-					trackball_data->up = temp.down;
-					trackball_data->down = temp.up;
-				#endif
-				#ifdef PIMORONI_TRACKBALL_INVERT_Y
-					trackball_data->left = temp.right;
-					trackball_data->right = temp.left;
-				#endif
-			}
-			return true;
+	uint8_t pointing_device_handle_buttons(uint8_t buttons, bool pressed, pointing_device_buttons_t button) {
+		if (pressed) {
+			buttons |= 1 << (button);
+			#ifdef HAPTIC_ENABLE	//Haptic feedback when trackball button is pressed
+				DRV_pulse(4);		//sharp_click
+			#endif
+		} else {
+			buttons &= ~(1 << (button));
 		}
-	#endif
+		return buttons;
+	}
+
+	report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
+		if (trackball_is_scrolling) {
+			mouse_report.h = mouse_report.x;
+			#ifndef PIMORONI_TRACKBALL_INVERT_X
+				mouse_report.v = 0.3*mouse_report.y;	//Multiplier to lower scrolling sensitivity
+			#else
+				mouse_report.v = 0.3*-mouse_report.y;	//invert vertical scroll direction
+			#endif
+			mouse_report.x = mouse_report.y = 0;
+		}
+		return mouse_report;
+	}
 
 	#if !defined(MOUSEKEY_ENABLE)	//Allows for button clicks on keymap even though mousekeys is not defined.
 		static bool mouse_button_one, trackball_button_one;
 	#endif
 
-	void trackball_register_button(bool pressed, enum mouse_buttons button) { //Register mouse keys for trackball.
+	void trackball_register_button(bool pressed, enum mouse_buttons button) {
 		report_mouse_t currentReport = pointing_device_get_report();
 		if (pressed) {
 			currentReport.buttons |= button;
-			/*#ifdef HAPTIC_ENABLE	//Haptic feedback when trackball button is pressed
-				DRV_pulse(4);		//sharp_click
-			#endif*/
 		} else {
 			currentReport.buttons &= ~button;
 		}
 		pointing_device_set_report(currentReport);
 	}
-	
-	void trackball_click(bool pressed, report_mouse_t* mouse) { //Use for mouse buttons. Click+drag is done with keymap and not compatible with trackball click functions.
-		if (pressed) { //trackball pressed
-			//tap_code_delay(KC_A,300); //Use delay as simple debounce for key strokes
-			mouse->buttons |= MOUSE_BTN1;
-			#ifdef HAPTIC_ENABLE	//Haptic feedback when trackball button is pressed
-				DRV_pulse(4);		//sharp_click
-			#endif
-		} else {  //released
-			mouse->buttons &= ~MOUSE_BTN1;
-		}
-	}
 #endif
 
 
 void matrix_scan_user(void) {
-  if (is_alt_tab_active) {	//Allows for use of super alt tab.
-    if (timer_elapsed(alt_tab_timer) > 1000) {
-      unregister_code(KC_LALT);
-      is_alt_tab_active = false;
-    }
-  }
-  #ifdef ENCODER_ENABLE
-	encoder_action_unregister();
-  #endif
+	#ifdef SUPER_ALT_TAB_ENABLE
+		if (is_alt_tab_active) {	//Allows for use of super alt tab.
+			if (timer_elapsed(alt_tab_timer) > 1000) {
+				unregister_code(KC_LALT);
+				is_alt_tab_active = false;
+			}
+		}
+	#endif
+	#ifdef ENCODER_ENABLE
+		encoder_action_unregister();
+	#endif
+	if (timer_elapsed32(oled_timer) > 60000) { //60000ms = 60s
+		pimoroni_trackball_set_rgbw(0,0,0, 0x00); //Turn off Pimoroni trackball LED when computer is idle for 1 minute. Would use suspend_power_down_user but the code is not working.
+	}
 }
 
 
@@ -212,32 +213,34 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 	#endif
 	
 	switch (keycode) { //For keycode overrides
+		#ifdef SUPER_ALT_TAB_ENABLE
 		case ATABF:	//Alt tab forwards
-		  if (record->event.pressed) {
-			if (!is_alt_tab_active) {
-			  is_alt_tab_active = true;
-			  register_code(KC_LALT);
-			}
-			alt_tab_timer = timer_read();
-			register_code(KC_TAB);
-		  } else {
-			unregister_code(KC_TAB);
-		  }
-		  return true;
+			if (record->event.pressed) {
+				if (!is_alt_tab_active) {
+					is_alt_tab_active = true;
+					register_code(KC_LALT);
+				}
+					alt_tab_timer = timer_read();
+					register_code(KC_TAB);
+				} else {
+					unregister_code(KC_TAB);
+				}
+			return true;
 		case ATABR:	//Alt tab reverse
-		  if (record->event.pressed) {
-			if (!is_alt_tab_active) {
-			  is_alt_tab_active = true;
-			  register_code(KC_LALT);
-			}
-			alt_tab_timer = timer_read();
-			register_code(KC_LSHIFT);
-			register_code(KC_TAB);
-		  } else {
-			unregister_code(KC_LSHIFT);
-			unregister_code(KC_TAB);
-		  }
-		  return true;
+			if (record->event.pressed) {
+				if (!is_alt_tab_active) {
+					is_alt_tab_active = true;
+					register_code(KC_LALT);
+				}
+					alt_tab_timer = timer_read();
+					register_code(KC_LSHIFT);
+					register_code(KC_TAB);
+				} else {
+					unregister_code(KC_LSHIFT);
+					unregister_code(KC_TAB);
+				}
+			return true;
+		#endif
 		  
 		case NMR:	//Move window to next monitor on right
 		  if (record->event.pressed) {
@@ -308,15 +311,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		#ifdef POINTING_DEVICE_ENABLE //Allow modes when trackball is enabled.
 				case PM_SCROLL:
 					if (record->event.pressed) {
-						if (trackball_is_scrolling()){ //Enable toggling for trackball scrolling
-							trackball_set_scrolling(false);
+						if (trackball_is_scrolling || was_scrolling){ //Enable toggling for trackball scrolling
+							trackball_is_scrolling=false;
 							was_scrolling=false; //Tracks status of scrolling setting. Works with holding of layer key for mouse mode.
-						}else if(was_scrolling==true){
-							trackball_set_scrolling(false);
-							was_scrolling=false;
-						}
-						else{
-							trackball_set_scrolling(true);
+						} else{
+							trackball_is_scrolling=true;
 							was_scrolling=true;
 						}
 						run_trackball_cleanup();
@@ -324,38 +323,40 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 					}
 				case PM_PRECISION:
 					if (record->event.pressed) {
-						if (trackball_get_precision()==1){ //Enable toggling for trackball precision
-							trackball_set_precision(1.75);
+						if (trackball_is_precision){ //Enable toggling for trackball precision
+							pimoroni_trackball_set_precision(1.75);
+							trackball_is_precision=false;
 						} else{
-							trackball_set_precision(1);
+							pimoroni_trackball_set_precision(0.8);
+							trackball_is_precision=true;
 						}
 						run_trackball_cleanup();
 						break;
 					}
-		#if !defined(MOUSEKEY_ENABLE) //Allow for using mouse buttons in the keymap when mouse keys is not enabled.
-				case KC_MS_BTN1:
-					mouse_button_one = record->event.pressed;
-					trackball_button_one = record->event.pressed;
-					//trackball_register_button(mouse_button_one | trackball_button_one, MOUSE_BTN1);
-					trackball_register_button(mouse_button_one, MOUSE_BTN1);
-					break;
-				case KC_MS_BTN2:
-					trackball_register_button(record->event.pressed, MOUSE_BTN2);
-					break;
-				case KC_MS_BTN3:
-					trackball_register_button(record->event.pressed, MOUSE_BTN3);
-					break;
-		#endif
+			#ifndef MOUSEKEY_ENABLE //Allow for using mouse buttons in the keymap when mouse keys is not enabled.
+					case KC_MS_BTN1:
+						mouse_button_one = record->event.pressed;
+						trackball_register_button(mouse_button_one | trackball_button_one, MOUSE_BTN1);
+						break;
+					case KC_MS_BTN2:
+						trackball_register_button(record->event.pressed, MOUSE_BTN2);
+						break;
+					case KC_MS_BTN3:
+						trackball_register_button(record->event.pressed, MOUSE_BTN3);
+						break;
+			#endif
 		#endif
 		
 		#ifdef KEYBOARD_PET // KEYBOARD PET STATUS
 			case KC_LCTL:
 			case KC_RCTL:
+				#ifndef SNEAK_DISABLE
 				if (record->event.pressed) { //Pet sneaks when control held.
 					isSneaking = true;
 				} else {
 					isSneaking = false;
 				}
+				#endif
 				#ifdef HAPTIC_ENABLE	//Set different patterns for keys on certain layers. In this case it is for gaming feedback.
 					if (record->event.pressed && (get_highest_layer(layer_state)==1)) {
 						DRV_pulse(51);		//buzz_20
@@ -390,23 +391,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		}
 	return true;
 }
-
-
-#if defined(OLED_ENABLE) || defined(POINTING_DEVICE_ENABLE)
-	void suspend_power_down_user(void) {
-		#ifdef OLED_ENABLE //Turn off OLEDs when computer is sleeping
-			oled_off();
-		#endif
-		#ifdef POINTING_DEVICE_ENABLE
-			trackball_set_rgbw(0,0,0, 0x00); //Turn off Pimoroni trackball LED when computer is sleeping
-		#endif
-	}
-#endif
-#ifdef POINTING_DEVICE_ENABLE
-	void suspend_wakeup_init_user(void) { //turn on Pimoroni LED when awoken
-		run_trackball_cleanup();
-	}
-#endif
 
 
 #if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_LAYERS)
@@ -447,10 +431,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 				rgblight_sethsv_noeeprom(50,255,80);
 				#ifdef POINTING_DEVICE_ENABLE
 					if (was_scrolling==true){ //Check if was scrolling when layer was left
-						trackball_set_scrolling(true);
+						trackball_is_scrolling=true;
 						run_trackball_cleanup();
 					} else{
-						trackball_set_scrolling(false);
+						trackball_is_scrolling=false;
 						run_trackball_cleanup();
 					}
 				#endif
@@ -480,7 +464,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 				#endif
 				#ifdef POINTING_DEVICE_ENABLE	//Set trackball mouse mode when layer 4 is activated
 					if (was_scrolling==true){	//Check if in scrolling mode when layer was activated
-						trackball_set_scrolling(false);
+						trackball_is_scrolling=false;
 						run_trackball_cleanup();
 					}
 				#endif
@@ -508,8 +492,19 @@ void keyboard_post_init_user(void)
 	#endif
 	layer_move(0); 						//Start on layer0 by default to set LED colours. Can remove to save a very small amount of space.
 	#ifdef POINTING_DEVICE_ENABLE
-		trackball_set_precision(1.75);	//Start trackball with lower precision mode
-		trackball_set_scrolling(true);	//Start trackball in scrolling mode
+		pimoroni_trackball_set_precision(1.75);	//Start trackball with lower precision mode
 		run_trackball_cleanup();
 	#endif
 }
+
+#ifdef POINTING_DEVICE_ENABLE
+	void suspend_power_down_user(void) {	//Code does not work, need to confirm why
+			pimoroni_trackball_set_rgbw(0,0,0, 0x00); //Turn off Pimoroni trackball LED when computer is sleeping
+	}
+#endif
+
+#ifdef POINTING_DEVICE_ENABLE
+	void suspend_wakeup_init_user(void) { //turn on Pimoroni LED when awoken
+		run_trackball_cleanup();
+	}
+#endif

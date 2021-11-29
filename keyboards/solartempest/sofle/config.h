@@ -58,16 +58,15 @@
 	#define COMBO_TERM 400 //Default combo time is 200ms. This is the time delay allowed between deleting each whole word with shift-backspace.
 #endif
 
-// Disabled for LTO
+// Disabled to save space
 #define NO_ACTION_MACRO
 #define NO_ACTION_FUNCTION
-
-// Disabled to save space
 #define NO_ACTION_ONESHOT		//Save 244 bytes (-244).
 #define NO_RESET				//Save 40 bytes (-40).
+#define LAYER_STATE_8BIT		//For less than 8 bits worth of layers.
 #undef LOCKING_SUPPORT_ENABLE	//For MX lock keys only.
 #undef LOCKING_RESYNC_ENABLE	//For MX lock keys only.
-#define LAYER_STATE_8BIT		//For less than 8 bits worth of layers.
+//#define SUPER_ALT_TAB_ENABLE	//Enable super alt tab custom keycode(+178).
 
 // Encoder support
 #define ENCODERS_PAD_A { F5 }
@@ -81,15 +80,16 @@
 
 // OLED settings
 #ifdef OLED_ENABLE
-	#define OLED_TIMEOUT 80000	//80000 = 80secs, 120000 = 2mins in ms.
-	#define OLED_BRIGHTNESS 90	//Default is 100.
-	#define SPLIT_OLED_ENABLE	//Synx on/off OLED state between halves (+100).
-	//#define SPLIT_WPM_ENABLE	//Enable WPM across split keyboards (+106-268).
+	#define OLED_TIMEOUT 80000			//80000 = 80secs, 120000 = 2mins in ms.
+	#define OLED_BRIGHTNESS 90			//Default is 100.
+	#define SPLIT_OLED_ENABLE			//Synx on/off OLED state between halves (+100).
+	//#define SPLIT_WPM_ENABLE			//Enable WPM across split keyboards (+106-268).
 	//#define SPLIT_LAYER_STATE_ENABLE	//Keep on master to save space (+142).
 	//#define SPLIT_LED_STATE_ENABLE	//Keep on master to save space (+112).
 	//#define SPLIT_MODS_ENABLE			//Keep on master to save space (+138).
-	#define OLED_LOGO			//Enable to print snakey custom logo on slave side (+108).
-	//#define OLED_NO_SLAVE		//Enable for snakey to not render slave OLED (-160).
+	#define OLED_LOGO					//Enable to print snakey custom logo on slave side (+108).
+	//#define OLED_NO_SLAVE				//Enable for snakey keyboard pet code to not render slave OLED (-160).
+	#define SNEAK_DISABLE				//Disable snakey keyboard pet sneak animation to save space (-132).
 #endif
 
 // Haptic feedback settings
@@ -104,6 +104,7 @@
 	#define V_RMS 2.0 		//Per ELV1411A datasheet.
 	#define F_LRA 150 		//Resonant frequency per ELV1411A datasheet.
 	
+	//#define HAPTIC_OFF_IN_LOW_POWER 1 //Turn off haptic feedback while sleeping (+54).
 	#define NO_HAPTIC_PUNCTUATION
 	#define NO_HAPTIC_ALPHA
 	#define NO_HAPTIC_MOD
@@ -113,11 +114,10 @@
 
 // Pimoroni trackball settings
 #ifdef POINTING_DEVICE_ENABLE
-	#define PIMORONI_TRACKBALL_INTERVAL_MS 8 //Default is 8ms
+	//#define PIMORONI_TRACKBALL_INTERVAL_MS 6 //Default is 8ms
 	//#define PIMORONI_TRACKBALL_ROTATE //Change according to your particular installed trackball orientation.
 	#define PIMORONI_TRACKBALL_INVERT_Y
 	#define PIMORONI_TRACKBALL_INVERT_X
-	//#define PIMORONI_TRACKBALL_CLICK //Incompatible with keymap mouse keys. Use trackball_register_button() and trackball_click() instead.
 #endif               
 
 // RGB settings
@@ -130,7 +130,6 @@
 	#define RGBLIGHT_LIMIT_VAL 160 //Power draw may still exceed the USB limitations of 0.6A at max brightness with white colour with this setting.
 	#define RGBLIGHT_LAYERS //Enable layer light indicators
 	#define RGBLIGHT_SLEEP //Turn off LEDs when computer sleeping (+72)
-	//#define RGBLIGHT_LAYERS_OVERRIDE_RGB_OFF //Shows lock key lighting status even when RGB is off
 
 	//RGB LED Conversion macro from physical array to electric array (+146). This results in better looking animated effects.
 	//First section is the LED matrix, second section is the electrical wiring order, and the third section is the desired mapping

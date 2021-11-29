@@ -12,9 +12,9 @@ GRAVE_ESC_ENABLE = no			# Save space by not using KC_GESC (+127)
 SPACE_CADET_ENABLE = no 		# Save space by not using space cadet left/right shift (+350)
 LTO_ENABLE = yes				# Save space by link time optimization
 
-EXTRAKEY_ENABLE = yes			# Audio control and System control (+450)
 RGBLIGHT_ENABLE = yes			# RGB lighting (+3826)
 ENCODER_ENABLE = yes			# Rotary encoders (+1112)
+EXTRAKEY_ENABLE = yes			# Audio control and System control (+450)
 MOUSEKEY_ENABLE = no			# Mouse keys (+1482). Not required for trackball usage.
 NKRO_ENABLE = no				# 6KRO by default. NKRO works if enabled (+328)
 COMBO_ENABLE = no				# Tap combo chording (+952)
@@ -25,7 +25,7 @@ OLED_DRIVER = SSD1306			# Specify OLED driver
 WPM_ENABLE = no					# WPM counter for typing-speed-reactive keyboard pets (+1298)
 
 POINTING_DEVICE_ENABLE = yes	# Enable Pimoroni Trackball on master (+2304)
-QUANTUM_LIB_SRC += i2c_master.c
-SRC += drivers/sensors/pimoroni_trackball.c
+POINTING_DEVICE_DRIVER = pimoroni_trackball
 
-HAPTIC_ENABLE += DRV2605L		# Enable Pimoroni Haptic Bzzz LRA (+1192)
+HAPTIC_ENABLE = yes				# Enable Pimoroni Haptic Bzzz LRA (+1192)
+HAPTIC_DRIVER += DRV2605L
