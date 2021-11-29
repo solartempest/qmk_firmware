@@ -34,8 +34,6 @@ enum custom_user_keycodes {
   KC_00 = SAFE_RANGE,
   ENCFUNC,		//Encoder functions
   KC_WINLCK,	//Toggles Win key on and off
-  RGB_TOI,		//Timeout idle time up
-  RGB_TOD,		//Timeout idle time down
   RGB_NITE,		//Turns off all rgb but allow rgb indicators to work
   NMR,			//Move window to monitor on right
   NML			//Move window to monitor on left
@@ -61,26 +59,9 @@ enum custom_user_keycodes {
 
 
 #ifdef RGB_MATRIX_ENABLE
-//RGB custom colours
-    #define RGB_GODSPEED 0x00, 0xE4, 0xFF // colour for matching keycaps
-    #define RGB_NAUTILUS 0x00, 0xA4, 0xA9 // Nautilus Font colours
-
     void activate_rgb_nightmode (bool turn_on);
     bool get_rgb_nightmode(void);
 #endif
-
-
-// IDLE TIMEOUTS
-#ifdef IDLE_TIMEOUT_ENABLE
-    #define TIMEOUT_THRESHOLD_DEFAULT   5    // default timeout minutes
-    #define TIMEOUT_THRESHOLD_MAX       140  // upper limits (2 hours and 10 minutes -- no rgb indicators above this value)
-
-    //prototype  functions
-    uint16_t get_timeout_threshold(void);
-    void timeout_reset_timer(void);
-    void timeout_update_threshold(bool increase);
-    void timeout_tick_timer(void);
-#endif  //IDLE_TIMEOUT_ENABLE
 
 
 // OTHER FUNCTION PROTOTYPE

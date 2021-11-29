@@ -43,7 +43,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          RGB_TOG,
         _______, _______, RGB_VAI, _______, _______, _______, _______, KC_PSCR, KC_SLCK, KC_PAUS, _______, _______, _______, RESET,            KC_HOME,
         KC_CAPS, _______, RGB_VAD, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,          KC_END,
-        _______,          _______, RGB_HUI, _______, _______, _______, KC_NLCK, _______, RGB_TOD, RGB_TOI, _______,          _______, RGB_MOD, _______,
+        _______,          _______, RGB_HUI, _______, _______, _______, KC_NLCK, _______, _______, _______, _______,          _______, RGB_MOD, _______,
         _______, KC_WINLCK, _______,                            _______,                          _______, _______, _______, RGB_SPD, RGB_RMOD, RGB_SPI
     ),
 
@@ -114,18 +114,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 			for (uint8_t i=0; i<ARRAYSIZE(LED_LIST_MODS); i++) {
                 rgb_matrix_set_color(LED_LIST_MODS[i], RGB_CHARTREUSE);
             };
-			
-            // Add RGB Timeout Indicator -- shows 0 to 139 using F row and num row;  larger numbers using 16bit code
-            /*uint16_t timeout_threshold = get_timeout_threshold();
-            if (timeout_threshold <= 10) rgb_matrix_set_color(LED_LIST_FUNCROW[timeout_threshold], RGB_RED);
-            else if (timeout_threshold < 140) {
-                rgb_matrix_set_color(LED_LIST_FUNCROW[(timeout_threshold / 10)], RGB_RED);
-                rgb_matrix_set_color(LED_LIST_NUMROW[(timeout_threshold % 10)], RGB_RED);
-            } else { // >= 140 minutes, just show these 3 lights
-                rgb_matrix_set_color(LED_LIST_NUMROW[10], RGB_RED);
-                rgb_matrix_set_color(LED_LIST_NUMROW[11], RGB_RED);
-                rgb_matrix_set_color(LED_LIST_NUMROW[12], RGB_RED);
-            }*/
             break;
         case _LOWER:
             for (uint8_t i=0; i<ARRAYSIZE(LED_LIST_NUMPAD); i++) {
@@ -169,13 +157,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         }
     }
 
-    void suspend_power_down_user(void) {
+/*  void suspend_power_down_user(void) {
         rgb_matrix_set_suspend_state(true);
     }
 
     void suspend_wakeup_init_user(void) {
         rgb_matrix_set_suspend_state(false);
-    }
+    }*/
 #endif
 
 

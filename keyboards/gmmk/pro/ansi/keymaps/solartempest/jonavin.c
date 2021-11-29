@@ -62,50 +62,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     }
 #endif // RGB_MATRIX_ENABLE
 
-// TIMEOUTS
-#ifdef IDLE_TIMEOUT_ENABLE
-    static uint16_t timeout_timer = 0;
-    static uint16_t timeout_counter = 0;  //in minute intervals
-    static uint16_t timeout_threshold = TIMEOUT_THRESHOLD_DEFAULT;
-
-    uint16_t get_timeout_threshold(void) {
-        return timeout_threshold;
-    }
-
-    void timeout_reset_timer(void) {
-        timeout_timer = timer_read();
-        timeout_counter = 0;
-    };
-
-    void timeout_update_threshold(bool increase) {
-        if (increase && timeout_threshold < TIMEOUT_THRESHOLD_MAX) timeout_threshold++;
-        if (!increase && timeout_threshold > 0) timeout_threshold--;
-    };
-
-    void timeout_tick_timer(void) {
-        if (timeout_threshold > 0) {
-            if (timer_elapsed(timeout_timer) >= 60000) { // 1 minute tick
-                timeout_counter++;
-                timeout_timer = timer_read();
-            }
-            #ifdef RGB_MATRIX_ENABLE
-                if (timeout_threshold > 0 && timeout_counter >= timeout_threshold) {
-                    rgb_matrix_disable_noeeprom();
-                }
-            #endif
-        } // timeout_threshold = 0 will disable timeout
-    }
-
-    __attribute__((weak)) void matrix_scan_keymap(void) {}
-#endif // IDLE_TIMEOUT_ENABLE
-
-void matrix_scan_user(void) {
-	#ifdef IDLE_TIMEOUT_ENABLE
-		timeout_tick_timer();
-		matrix_scan_keymap();
-	#endif
-}
-
 
 #if defined(ENCODER_ENABLE) && defined(ENCODER_DEFAULTACTIONS_ENABLE)       // Encoder Functionality
     #ifndef DYNAMIC_KEYMAP_LAYER_COUNT
@@ -145,11 +101,6 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
                 register_mods(MOD_BIT(KC_LALT));
             } else  {
                 switch (selected_layer) {
-                case _FN1:
-                    #ifdef IDLE_TIMEOUT_ENABLE
-                        timeout_update_threshold(true);
-                    #endif
-                    break;
                 default:
                     tap_code(KC_VOLU);       // Otherwise it just changes volume
                     break;
@@ -178,11 +129,6 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
                 register_mods(MOD_BIT(KC_LALT));
             } else {
                 switch (selected_layer) {
-                case _FN1:
-                    #ifdef IDLE_TIMEOUT_ENABLE
-                        timeout_update_threshold(false);
-                    #endif
-                    break;
                 default:
                     tap_code(KC_VOLD);
                     break;
@@ -213,18 +159,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 			} else  unregister_code16(keycode);
 			break;
 
-		#ifdef IDLE_TIMEOUT_ENABLE
-			case RGB_TOI:
-				if(record->event.pressed) {
-					timeout_update_threshold(true);
-				} else  unregister_code16(keycode);
-				break;
-			case RGB_TOD:
-				if(record->event.pressed) {
-					 timeout_update_threshold(false);  //decrease timeout
-				} else  unregister_code16(keycode);
-				break;
-		#endif // IDLE_TIMEOUT_ENABLE
 		#ifdef RGB_MATRIX_ENABLE
 			case RGB_NITE:
 				if(record->event.pressed) {
@@ -259,9 +193,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 				#ifdef RGB_MATRIX_ENABLE
 					rgb_matrix_enable_noeeprom();
 				#endif
-				#ifdef IDLE_TIMEOUT_ENABLE
-					timeout_reset_timer();  //reset activity timer
-				#endif
 			}
 			break;
 	}
@@ -278,7 +209,6 @@ void activate_numlock(bool turn_on) {
 
 
 // INITIAL STARTUP
-
 __attribute__ ((weak)) void keyboard_post_init_keymap(void) {}
 
 void keyboard_post_init_user(void) {
@@ -286,7 +216,4 @@ void keyboard_post_init_user(void) {
     #ifdef STARTUP_NUMLOCK_ON
         activate_numlock(true); // turn on Num lock by default so that the numpad layer always has predictable results
     #endif // STARTUP_NUMLOC_ON
-    #ifdef IDLE_TIMEOUT_ENABLE
-        timeout_timer = timer_read(); // set inital time for ide timeout
-    #endif
 }

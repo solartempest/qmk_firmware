@@ -6,7 +6,6 @@ LTO_ENABLE = no							# MCU has 256kB space - 4kB for the EEPROM
 
 TD_LSFT_CAPSLOCK_ENABLE = yes			# Enable Jonavin's custom left shift keycode. Requires Tap Dance.
 TAP_DANCE_ENABLE = yes					# Tap Dance
-IDLE_TIMEOUT_ENABLE = yes				# Turns off RGB after idle timeout
 STARTUP_NUMLOCK_ON = yes				# Turns numlock on by default
 ENCODER_DEFAULTACTIONS_ENABLE = yes		# Enable Jonavin's custom encoder actions
 
@@ -22,12 +21,6 @@ endif
 ifeq ($(strip $(TD_LSFT_CAPSLOCK_ENABLE)), yes)
     OPT_DEFS += -DTD_LSFT_CAPSLOCK_ENABLE
 endif
-ifeq ($(strip $(IDLE_TIMEOUT_ENABLE)), yes)
-    OPT_DEFS += -DIDLE_TIMEOUT_ENABLE
-endif
 ifeq ($(strip $(STARTUP_NUMLOCK_ON)), yes)
     OPT_DEFS += -DSTARTUP_NUMLOCK_ON
-endif
-ifeq ($(strip $(COLEMAK_LAYER_ENABLE)), yes)
-    OPT_DEFS += -DCOLEMAK_LAYER_ENABLE
 endif
