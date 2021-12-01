@@ -231,16 +231,14 @@
 	bool oled_task_user(void) {
 		led_usb_state = host_keyboard_led_state();
 
-		if (is_keyboard_master()) { //OLED timeout 30000ms = 30s
-			if (timer_elapsed32(oled_timer) > 30000) {
+		
+		if (is_keyboard_master()) {
+			if (timer_elapsed32(oled_timer) > 30000) {//OLED timeout 30000ms = 30s
 				oled_off();
 				return false;
 			} else {
 				oled_on();
 			}
-		}
-		
-		if (is_keyboard_master()) {
 			print_status_narrow();
 		} else {
 			#ifndef OLED_NO_SLAVE

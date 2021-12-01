@@ -83,13 +83,15 @@
 	#define OLED_TIMEOUT 80000			//80000 = 80secs, 120000 = 2mins in ms.
 	#define OLED_BRIGHTNESS 90			//Default is 100.
 	#define SPLIT_OLED_ENABLE			//Synx on/off OLED state between halves (+100).
-	//#define SPLIT_WPM_ENABLE			//Enable WPM across split keyboards (+106-268).
+	#ifdef WPM_ENABLE
+		#define SPLIT_WPM_ENABLE			//Enable WPM across split keyboards (+106-268).
+	#endif
 	//#define SPLIT_LAYER_STATE_ENABLE	//Keep on master to save space (+142).
 	//#define SPLIT_LED_STATE_ENABLE	//Keep on master to save space (+112).
 	//#define SPLIT_MODS_ENABLE			//Keep on master to save space (+138).
 	#define OLED_LOGO					//Enable to print snakey custom logo on slave side (+108).
-	//#define OLED_NO_SLAVE				//Enable for snakey keyboard pet code to not render slave OLED (-160).
-	#define SNEAK_DISABLE				//Disable snakey keyboard pet sneak animation to save space (-132).
+	//#define OLED_NO_SLAVE				//Disable snakey keyboard pet slave OLED rendering (-160).
+	//#define SNEAK_DISABLE				//Disable snakey keyboard pet sneak animation to save space (-132).
 #endif
 
 // Haptic feedback settings
@@ -128,7 +130,7 @@
 	//#define RGBLIGHT_ANIMATIONS // Very memory intensive (+2604)
 	#define RGBLIGHT_EFFECT_STATIC_GRADIENT //Preferred RGB effect (+262)
 	#define RGBLIGHT_LIMIT_VAL 160 //Power draw may still exceed the USB limitations of 0.6A at max brightness with white colour with this setting.
-	#define RGBLIGHT_LAYERS //Enable layer light indicators
+	//#define RGBLIGHT_LAYERS //Enable layer light indicators. Not required as updates are done in layer_state_set_user and led_update_user (+588).
 	#define RGBLIGHT_SLEEP //Turn off LEDs when computer sleeping (+72)
 
 	//RGB LED Conversion macro from physical array to electric array (+146). This results in better looking animated effects.

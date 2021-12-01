@@ -238,14 +238,9 @@
 			#endif
 			
 			/* wpm counter */
-			char wpm_str[8];
 			oled_set_cursor(0,13);
-			//sprintf(wpm_str, " %03d", current_wpm_read); //Replaced with two lines of code below to save space.
 			oled_write_P(PSTR("WPM: "), false);
 			oled_write(get_u8_str(get_current_wpm(), ' '), false);
-			oled_write(wpm_str, false);
-			oled_set_cursor(0,14);
-			oled_write(" wpm", false);
 		}
 	#endif
 	 
@@ -293,7 +288,7 @@
 		oled_write("Scrl", led_usb_state.scroll_lock);
 	 
 		/* KEYBOARD PET RENDER START */
-		render_luna(0,13);
+		render_luna(0,12);
 		/* KEYBOARD PET RENDER END */
 	}
 	 
@@ -306,17 +301,14 @@
 		current_wpm_read = get_current_wpm();
 		/* KEYBOARD PET VARIABLES END */
 		led_usb_state = host_keyboard_led_state();
-
-		if (is_keyboard_master()) { //Drashna's OLED timeout off code for animations
-			if (timer_elapsed32(oled_timer) > 30000) {
+		
+		if (is_keyboard_master()) {
+			if (timer_elapsed32(oled_timer) > 30000) {//OLED timeout 30000ms = 30s
 				oled_off();
 				return false;
 			} else {
 				oled_on();
 			}
-		}
-		
-		if (is_keyboard_master()) {
 			print_status_narrow();
 		} else {
 			print_logo_narrow();

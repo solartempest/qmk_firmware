@@ -28,7 +28,6 @@
 		//#include "bongocat.c" //OLED code for Bongocat, original code by foureight84.
 		//#include "luna.c" //OLED code for Luna, original code by Hellsingcoder and adapted by Jackasaur.
 		//#include "snakey.c" //OLED code for Snakey, customized from Luna. If not used, do not use OLED_LOGO in config.h.
-		//#include <stdio.h> //This is required for OLED sprintf (should not be required anymore since sprintf removed from my code).
 		#include "snakey_minimal.c" //OLED code for Snakey, without WPM/related animations to save space. If not used, do not use OLED_LOGO in config.h.
 #endif
 
@@ -387,46 +386,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 					DRV_pulse(49);		//buzz_60
 				}
 		#endif
-		
 		}
 	return true;
 }
 
 
-#if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_LAYERS)
-	//LED Lock keys status indicators are used since the sofle doesn't have dedicated LEDS for this.
-	//Note 1: These will assign static colour and brightness to the LED range specified.
-	//Note 2: Base layer0 is required for lock layers to work, even if range for static LED colours is set to 0,0.
-	const rgblight_segment_t PROGMEM my_layer0_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 95,255,90}); //Static RGB colour is ignored as range is 0,0.
-	const rgblight_segment_t PROGMEM my_layer1_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 252,255,125});
-	const rgblight_segment_t PROGMEM my_layer2_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 95,255,90});
-	const rgblight_segment_t PROGMEM my_layer3_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 128,255,100});
-	const rgblight_segment_t PROGMEM my_layer4_layer[] = RGBLIGHT_LAYER_SEGMENTS({0, 0, 215,255,120});
-	const rgblight_segment_t PROGMEM my_capslock_layer[] = RGBLIGHT_LAYER_SEGMENTS({4, 3, 43,100,170}); //White-left caps lock indication
-	const rgblight_segment_t PROGMEM my_numlock_layer[] = RGBLIGHT_LAYER_SEGMENTS({28, 3, 43,100,170}); //White-right num lock indication. Since this indicator is inverted, it must be on the master side of the keyboard to shut off properly when the computer is sleeping.
-	const rgblight_segment_t PROGMEM my_scrollock_layer[] = RGBLIGHT_LAYER_SEGMENTS({55, 3, 43,100,170}); //White-middle-right scroll lock indication
-	const rgblight_segment_t *const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST( //Lighting layers
-		my_layer0_layer,	//Base layer with no indications
-		my_layer1_layer,
-		my_layer2_layer,
-		my_layer3_layer,
-		my_layer4_layer,
-		my_capslock_layer,	//Highest status indicators override other layers
-		my_numlock_layer,
-		my_scrollock_layer
-	);
-#endif
-
-#if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_LAYERS)
-	layer_state_t layer_state_set_user(layer_state_t state)	//Use for layer lighting. This is independent from lock key LED indicators.
+#ifdef RGBLIGHT_ENABLE
+	layer_state_t layer_state_set_user(layer_state_t state)	//Use for layer lighting. This method uses less space than RGBLIGHT_LAYER_SEGMENTS.
 	{
-		rgblight_set_layer_state(0, layer_state_cmp(state, 0));
-		rgblight_set_layer_state(1, layer_state_cmp(state, 1));
-		rgblight_set_layer_state(2, layer_state_cmp(state, 2));
-		rgblight_set_layer_state(3, layer_state_cmp(state, 3));
-		rgblight_set_layer_state(4, layer_state_cmp(state, 4));
-		
-		switch(biton32(state)){ // Change all other LEDs based on layer state as well
+		switch (get_highest_layer(state)) { // Change all other LEDs based on layer state as well
 			case 0:
 				rgblight_sethsv_noeeprom(50,255,80);
 				#ifdef POINTING_DEVICE_ENABLE
@@ -471,12 +439,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		  }
 		return state;
 	}
-
-	bool led_update_user(led_t led_state)
+	
+	bool led_update_user(led_t led_state)	//Lock key status indicators
 	{
-		rgblight_set_layer_state(5, led_state.caps_lock); //Activate capslock lighting layer
-		rgblight_set_layer_state(6, !(led_state.num_lock)); //Invert the indication so numlock does not always appear "on".
-		rgblight_set_layer_state(7, led_state.scroll_lock); //Activate scrollock lighting layer
+		if(led_state.caps_lock){
+			rgblight_sethsv_range(43,100,170, 4,7); //White-left caps lock indication
+		}
+		if(!(led_state.num_lock)){
+			rgblight_sethsv_range(43,100,170, 28,31); //White-right num lock indication. Since this indicator is inverted, it must be on the master side of the keyboard to shut off properly when the computer is sleeping.
+		}
+		if(led_state.scroll_lock){
+			rgblight_sethsv_range(43,100,170, 16,19); //White-middle scroll lock indication
+		}
 		return true;
 	}
 #endif
@@ -486,9 +460,6 @@ void keyboard_post_init_user(void)
 {
 	#ifdef RGBLIGHT_ENABLE
 		rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_GRADIENT+8); //Set to static gradient 9
-	#endif
-	#if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_LAYERS)
-		rgblight_layers = my_rgb_layers;	//Enable LED layer lighting
 	#endif
 	layer_move(0); 						//Start on layer0 by default to set LED colours. Can remove to save a very small amount of space.
 	#ifdef POINTING_DEVICE_ENABLE
