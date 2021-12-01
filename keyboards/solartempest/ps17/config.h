@@ -61,10 +61,6 @@
 #define TAPPING_TOGGLE 2 //Tap TT twice to toggle layer
 #define TAPPING_TERM 160 //Tapping duration in ms
 
-// Mechanical locking support. Use KC_LCAP, KC_LNUM or KC_LSCR instead in keymap.
-#define LOCKING_SUPPORT_ENABLE
-#define LOCKING_RESYNC_ENABLE // Locking resynchronize hack
-
 // For LED status indicators
 #define LED_NUM_LOCK_PIN D0
 #define LED_CAPS_LOCK_PIN D5
@@ -79,8 +75,8 @@
 	#define RGBLIGHT_VAL_STEP 8
 	#define RGBLIGHT_DEFAULT_VAL 40 //Default brightness on clearing EEPROM
 	#define RGBLIGHT_LIMIT_VAL 180 //Brightness level max is 255
-	#define RGBLIGHT_LAYERS //Enable layer light indicators
-	#define RGBLIGHT_LAYERS_OVERRIDE_RGB_OFF
+	//#define RGBLIGHT_LAYERS //Enable layer light indicators. Not required as layer_state_set_user is used instead.
+	//#define RGBLIGHT_LAYERS_OVERRIDE_RGB_OFF
 	#define RGBLIGHT_SLEEP  	//Turn off LEDs when computer sleeping (+72)
 	#define RGBLIGHT_ANIMATIONS //Very memory intensive (+2604)
 

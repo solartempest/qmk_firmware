@@ -391,11 +391,11 @@ void keyboard_post_init_user(void) {
 
 #ifdef RGBLIGHT_ENABLE
 layer_state_t layer_state_set_user(layer_state_t state) {
-	rgblight_set_layer_state(0, layer_state_cmp(state, 0));    // Multiple layers will light up if both kb layers are active
+	/*rgblight_set_layer_state(0, layer_state_cmp(state, 0));    // Multiple layers will light up if both kb layers are active
     rgblight_set_layer_state(1, layer_state_cmp(state, 1));
     rgblight_set_layer_state(2, layer_state_cmp(state, 2));
     rgblight_set_layer_state(3, layer_state_cmp(state, 3));
-    rgblight_set_layer_state(4, layer_state_cmp(state, 4));
+    rgblight_set_layer_state(4, layer_state_cmp(state, 4));*/
 	
 	// This is what the LED layout is.
 	// 1,                 0, 
@@ -406,7 +406,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 	// 22, 21, 20, 19,   
 	// 27, 26, 25, 24,    23 
 		
-	switch(biton32(state)){ // Change all other LEDs based on layer state as well
+	switch (get_highest_layer(state)) { // Change all other LEDs based on layer state as well
 		case 0:
 			rgblight_sethsv_noeeprom(50,255,100);
 			//You can selectively decrease certain LEDs if you are have a clear acrylic case and the shine-through is bothersome. Rgblight_sethsv_at() can be used here for those LEDs (0, 2, 4, 14, and 23). Otherwise some black tape on the acrylic plate or foam underneath the FR4 plate will do the trick.
