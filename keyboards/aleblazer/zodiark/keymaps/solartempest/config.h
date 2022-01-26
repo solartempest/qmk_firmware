@@ -18,7 +18,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MASTER_LEFT
 
+#undef DEBOUNCE
+#define DEBOUNCE 6 //Default is 5
+
+// Tapping settings
+#define TAP_CODE_DELAY 10
+#define TAPPING_TOGGLE 2 //Tap TT twice to toggle layer
+#define TAPPING_TERM 160 //Tapping duration in ms
+
+// Disabled to save space
+#define NO_ACTION_MACRO
+#define NO_ACTION_FUNCTION
+#define NO_ACTION_ONESHOT		//Save 244 bytes (-244).
+#define NO_RESET				//Save 40 bytes (-40).
+#define LAYER_STATE_8BIT		//For less than 8 bits worth of layers.
+#undef LOCKING_SUPPORT_ENABLE	//For MX lock keys only.
+#undef LOCKING_RESYNC_ENABLE	//For MX lock keys only.
+
+
 #ifdef OLED_ENABLE
-  #define OLED_DISPLAY_128X64
-  #define OLED_TIMEOUT 400000
+	#define OLED_DISPLAY_128X64
+	#define OLED_TIMEOUT 80000			//80000 = 80secs, 120000 = 2mins in ms.
+	#define SPLIT_OLED_ENABLE			//Synx on/off OLED state between halves (+100).
+#endif
+
+#ifdef RGBLIGHT_ENABLE
+	#undef RGBLIGHT_ANIMATIONS // Very memory intensive (+2604)
+	#define RGBLIGHT_EFFECT_STATIC_GRADIENT //Preferred RGB effect (+262)
+	#define RGBLIGHT_SLEEP //Turn off LEDs when computer sleeping (+72)
+#endif
+
+#ifdef VIA_ENABLE
+	#define DYNAMIC_KEYMAP_LAYER_COUNT 5
 #endif
