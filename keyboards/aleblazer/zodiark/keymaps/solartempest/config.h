@@ -35,18 +35,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #undef LOCKING_SUPPORT_ENABLE	//For MX lock keys only.
 #undef LOCKING_RESYNC_ENABLE	//For MX lock keys only.
 
-
 #ifdef OLED_ENABLE
 	#define OLED_DISPLAY_128X64
 	#define OLED_TIMEOUT 80000			//80000 = 80secs, 120000 = 2mins in ms.
 	#define SPLIT_OLED_ENABLE			//Synx on/off OLED state between halves (+100).
+	#define OLED_LOGO					//Enable to print snakey custom logo on slave side (+108).
 #endif
 
 #ifdef RGBLIGHT_ENABLE
 	#undef RGBLIGHT_ANIMATIONS // Very memory intensive (+2604)
 	#define RGBLIGHT_EFFECT_STATIC_GRADIENT //Preferred RGB effect (+262)
+	//#define RGBLIGHT_EFFECT_SNAKE //For testing LED order
 	#define RGBLIGHT_SLEEP //Turn off LEDs when computer sleeping (+72)
 #endif
+
+// Pimoroni trackball settings
+#ifdef POINTING_DEVICE_ENABLE
+	//#define PIMORONI_TRACKBALL_INTERVAL_MS 6 //Default is 8ms
+	#define POINTING_DEVICE_ROTATION_90
+	#define PIMORONI_TRACKBALL_INVERT_Y
+	#define PIMORONI_TRACKBALL_INVERT_X
+#endif      
 
 #ifdef VIA_ENABLE
 	#define DYNAMIC_KEYMAP_LAYER_COUNT 5
