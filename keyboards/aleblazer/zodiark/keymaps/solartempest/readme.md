@@ -6,8 +6,6 @@
 
 Zodiark is a 68-key column-staggered split keyboard with per key RGB, rotary encoders, and 2x I2C headers per side. Created by Aleblazer.
 
-For details about the keyboard design, refer to Josef's blog: [Sofle Keyboard - a split keyboard based on Lily58 and Crkbd](https://www.splitlogic.xyz)
-
 Build guide is available here: [Zodiark build log/guide](https://www.splitlogic.xyz/buildguides/zodiark-build-guide)
 
 * Keyboard Maintainer: [Solartempest]
