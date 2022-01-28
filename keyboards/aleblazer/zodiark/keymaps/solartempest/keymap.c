@@ -13,8 +13,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include QMK_KEYBOARD_H
 #ifdef OLED_ENABLE
-	//#include "oled.c"
-	#include "snakey_minimal.c"
+	#include "snake_photo.c"
 #endif
 #include "encoder.c"
 
@@ -22,6 +21,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	bool trackball_is_scrolling = true;		//Default mode is scrolling
 	bool trackball_is_precision = false;	//Default mode is less precise
 	bool was_scrolling = true;	//Remember preferred state of trackball scrolling
+#endif
+
+#ifdef HAPTIC_ENABLE
+	#include "drivers/haptic/DRV2605L.h"
+#endif
+
+#if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_LAYERS)
+	extern rgblight_config_t rgblight_config; // To pull layer status for RGBLIGHT
+#endif
+
+//Variables for custom keycodes
+#ifdef SUPER_ALT_TAB_ENABLE
+	bool is_alt_tab_active = false; // Super Alt Tab Code
+	uint16_t alt_tab_timer = 0;
+#endif
+bool lshift_held = false;	// LShift Backspace Delete whole Word Code
+bool rshift_held = false;	// RShift Backspace Delete whole Word Code
+static uint16_t held_shift = 0;
+
+#ifdef D2SKATE_MACRO_ENABLE
+	uint16_t D2SKATE_TIMER = 0;
+	bool D2SKATE_skated = false;	//Has skated
+	bool D2SKATE_reset = true;	//Has skated
 #endif
 
 #ifdef VIA_ENABLE
@@ -48,51 +70,76 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	};
 #endif
 
+#ifdef VIA_ENABLE
+	// Extra keys are added for rotary encoder support in VIA
+	#define LAYOUT_via( \
+		 L00, L01, L02, L03, L04, L05,                               R05, R04, R03, R02, R01, R00, \
+		 L10, L11, L12, L13, L14, L15, L06,                     R06, R15, R14, R13, R12, R11, R10, \
+		 L20, L21, L22, L23, L24, L25, L16,                     R16, R25, R24, R23, R22, R21, R20, \
+		 L30, L31, L32, L33, L34, L35, L26, L36, L37, R37, R36, R26, R35, R34, R33, R32, R31, R30, \
+		 L40, L41, L42, L43, L44,    L45,   L46, L47, R47, R46,   R45,    R44, R43, R42, R41, R40  \
+		  ) \
+		  { \
+		 { L00,   L01,   L02,   L03,   L04,   L05,   L06,   KC_NO }, \
+		 { L10,   L11,   L12,   L13,   L14,   L15,   L16,   KC_NO }, \
+		 { L20,   L21,   L22,   L23,   L24,   L25,   L26,   KC_NO }, \
+		 { L30,   L31,   L32,   L33,   L34,   L35,   L36,   L37   }, \
+		 { L40,   L41,   L42,   L43,   L44,   L45,   L46,   L47   }, \
+		 { R00,   R01,   R02,   R03,   R04,   R05,   R06,   KC_NO }, \
+		 { R10,   R11,   R12,   R13,   R14,   R15,   R16,   KC_NO }, \
+		 { R20,   R21,   R22,   R23,   R24,   R25,   R26,   KC_NO }, \
+		 { R30,   R31,   R32,   R33,   R34,   R35,   R36,   R37   }, \
+		 { R40,   R41,   R42,   R43,   R44,   R45,   R46,   R47   }  \
+		}
+#endif
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-/*
+#ifndef VIA_ENABLE //This will bypass the layout when VIA is enabled to save space. Requires loading layout in VIA otherwise random keys may be occur.
 	[0] = LAYOUT(
-      KC_ESC,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                           KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_BSPC,
-      KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,  KC_LBRC,                       KC_RBRC,  KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSLS,
-      MO(3),   KC_A,    KC_S,    KC_D,    KC_F,    KC_G,  KC_MINS,                        KC_EQL,  KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,
-      KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,  KC_GRV, KC_MUTE,      RGB_TOG, KC_DEL,KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_ENT ,
-      KC_LCTL, KC_LALT, KC_LGUI, KC_APP, MO(1),       KC_SPC,   KC_ENT,           KC_ENT,   KC_SPC,  MO(2),    KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT
-    ),
+	  KC_ESC,  KC_1,    KC_2,    KC_3,   KC_4,  KC_5,                                                         KC_6,   KC_7,    KC_8,    KC_9,    KC_0,    KC_BSPC,
+	  KC_TAB,  KC_Q,    KC_W,    KC_E,   KC_R,  KC_T,  KC_LBRC,                                      KC_RBRC, KC_Y,   KC_U,    KC_I,    KC_O,    KC_P,    KC_BSLS,
+	  MO(3),   KC_A,    KC_S,    KC_D,   KC_F,  KC_G,  KC_MINS,                                      KC_EQL,  KC_H,   KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,
+	  KC_LSFT, KC_Z,    KC_X,    KC_C,   KC_V,  KC_B,  KC_GRV,  KC_MUTE, _______, _______, RGB_TOG,  KC_DEL,  KC_N,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_ENT,
+	  KC_LCTL, KC_LALT, KC_LGUI, KC_APP, MO(1),    KC_SPC,      KC_ENT,  _______, _______, KC_ENT,       KC_SPC,       MO(2),  KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT
+	  ),
 		
 	[1] = LAYOUT(
-      _______, KC_F1, KC_F2, KC_F3, KC_F4,   KC_F5,                                KC_F6,   KC_F7,   KC_F8, KC_F9, KC_F10, KC_F11,
-      KC_PSLS, KC_P7, KC_P8, KC_P9, KC_NLCK, _______, _______,                   _______, _______, KC_PSLS, KC_P7, KC_P8, KC_P9, KC_F12,
-      KC_CAPS, KC_P4, KC_P5, KC_P6, KC_NLCK, _______, _______,                   _______, _______, _______, KC_P4, KC_P5, KC_P6, KC_NLCK,
-      _______, KC_P1, KC_P2, KC_P3, _______, _______, _______, _______,  _______, _______, _______, _______, KC_P1, KC_P2, KC_P3, _______,
-      _______, KC_P0, KC_PDOT, KC_PENT, _______,     _______,  _______,   _______,    _______,   _______, KC_P0, KC_PDOT, KC_PENT, _______
-      ),
+	  _______, KC_F1, KC_F2,   KC_F3,   KC_F4,   KC_F5,                                                             KC_F6,   KC_F7,   KC_F8, KC_F9,   KC_F10,  KC_F11,
+	  KC_PSLS, KC_P7, KC_P8,   KC_P9,   KC_NLCK, _______, _______,                                         _______, _______, KC_PSLS, KC_P7, KC_P8,   KC_P9,   KC_F12,
+	  KC_CAPS, KC_P4, KC_P5,   KC_P6,   KC_NLCK, _______, _______,                                         _______, _______, _______, KC_P4, KC_P5,   KC_P6,   KC_NLCK,
+	  _______, KC_P1, KC_P2,   KC_P3,   _______, _______, _______, _______,  _______,  _______,  _______,  _______, _______, _______, KC_P1, KC_P2,   KC_P3,   _______,
+	  _______, KC_P0, KC_PDOT, KC_PENT, _______,      _______,     _______,  _______,  _______,  _______,  _______,    _______,       KC_P0, KC_PDOT, KC_PENT, _______
+	  ),
 	  
 	[2] = LAYOUT(
-      _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                           KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10,  KC_F11,
-      KC_PSLS, KC_P7, KC_P8, KC_P9, KC_NLCK, _______, _______,                    _______, _______, KC_PSLS, KC_P7, KC_P8, KC_P9, KC_F12,
-      KC_CAPS, KC_P4, KC_P5, KC_P6, KC_NLCK, _______, _______,                    _______, _______, _______, KC_P4, KC_P5, KC_P6, KC_NLCK,
-      _______, KC_P1, KC_P2, KC_P3, _______, _______, _______, _______,  _______, _______, _______, _______, KC_P1, KC_P2, KC_P3, _______,
-      _______, KC_P0, KC_PDOT, KC_PENT, _______,    _______,   _______,  _______,    _______,    _______, KC_P0, KC_PDOT, KC_PENT, _______
-      ),
+	  _______, KC_F1, KC_F2,   KC_F3,   KC_F4,   KC_F5,                                                            KC_F6,   KC_F7,   KC_F8, KC_F9,   KC_F10,  KC_F11,
+	  KC_PSLS, KC_P7, KC_P8,   KC_P9,   KC_NLCK, _______, _______,                                        _______, _______, KC_PSLS, KC_P7, KC_P8,   KC_P9,   KC_F12,
+	  KC_CAPS, KC_P4, KC_P5,   KC_P6,   KC_NLCK, _______, _______,                                        _______, _______, _______, KC_P4, KC_P5,   KC_P6,   KC_NLCK,
+	  _______, KC_P1, KC_P2,   KC_P3,   _______, _______, _______, _______,  _______,  _______,  _______, _______, _______, _______, KC_P1, KC_P2,   KC_P3,   _______,
+	  _______, KC_P0, KC_PDOT, KC_PENT, _______,       _______,    _______,  _______,  _______,  _______,    _______,       _______, KC_P0, KC_PDOT, KC_PENT, _______
+	  ),
 
 	[3] = LAYOUT(
-      _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                              KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10,  KC_F11,
-      _______, _______, _______, _______, _______, _______, _______,                   _______, _______, EEP_RST, _______, _______, _______, KC_F12,
-      _______, _______, _______, _______, _______, _______, _______,                   _______, _______, RGB_TOG, _______, _______, _______, _______,
-      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, RGB_MOD, RGB_SPI, RGB_HUI, RGB_SAI, RGB_VAI,
-      _______, _______, _______, _______, _______,      _______,     _______, _______,     _______,      RGB_RMOD, RGB_SPD, RGB_HUD, RGB_SAD, RGB_VAD
-      )
-*/
+	  _______, _______, _______, _______, _______, _______,                                                       _______, _______, _______, _______, _______, _______,
+	  _______, _______, _______, _______, _______, _______, _______,                                     _______, _______, _______, _______, _______, _______, _______,
+	  _______, _______, _______, _______, _______, _______, _______,                                     _______, _______, _______, _______, _______, _______, _______,
+	  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+	  _______, _______, _______, _______, _______,     _______,      _______, _______, _______, _______,     _______,      _______, _______, _______, _______, _______
+	  )
+#endif
 };
 
 #ifdef POINTING_DEVICE_ENABLE
 	void run_trackball_cleanup(void) {	//Set colour of trackball LED. Does not require RGBLIGHT_ENABLE if colour shorthands are not used.
 		#ifdef POINTING_DEVICE_ENABLE
 		if (trackball_is_scrolling) {
-			pimoroni_trackball_set_rgbw(43, 153, 103, 0x00);
+			pimoroni_trackball_set_rgbw(217, 165, 33, 0x00);	//RGB_GOLDENROD in number form. 
+			//pimoroni_trackball_set_rgbw(43, 153, 103, 0x00);
 		} else if (!trackball_is_precision) {
 			pimoroni_trackball_set_rgbw(0, 27, 199, 0x00);
 		} else {
-			pimoroni_trackball_set_rgbw(217, 165, 33, 0x00);	//RGB_GOLDENROD in number form. 
+			//pimoroni_trackball_set_rgbw(217, 165, 33, 0x00);	//RGB_GOLDENROD in number form.
+			pimoroni_trackball_set_rgbw(43, 153, 103, 0x00);
 		}
 		#endif
 	}
@@ -174,7 +221,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 			return true;
 		#endif
 		  
-/*		case NMR:	//Move window to next monitor on right
+		case NMR:	//Move window to next monitor on right
 		  if (record->event.pressed) {
 			register_code(KC_LSFT);
 			register_code(KC_LWIN);
@@ -266,7 +313,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 				}
 				return true;
 		#endif
-*/			
+
 		#ifdef POINTING_DEVICE_ENABLE //Allow modes when trackball is enabled.
 				case PM_SCROLL:
 					if (record->event.pressed) {

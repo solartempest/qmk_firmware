@@ -18,6 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MASTER_LEFT
 
+#undef MATRIX_ROWS
+#undef MATRIX_COLS
+#undef MATRIX_ROW_PINS
+#undef MATRIX_COL_PINS
+#undef ENCODER_RESOLUTION
+#define MATRIX_ROWS 10
+#define MATRIX_COLS 8 //Added extra column for rotary encoder VIA mapping.
+#define MATRIX_ROW_PINS { C6, D7, E6, B4, F4 }
+#define MATRIX_COL_PINS { F5, F6, F7, B1, B3, B2, B6, NO_PIN } //A virtual pin is needed for the encoder key matrix in via.
+#define ENCODER_RESOLUTION 4 //Reduce encoder double-input issue.
+
 #undef DEBOUNCE
 #define DEBOUNCE 6 //Default is 5
 
