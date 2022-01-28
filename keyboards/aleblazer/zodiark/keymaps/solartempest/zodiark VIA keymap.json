@@ -1,7 +1,7 @@
 {
   "name":"Zodiark",
   "vendorId":"0xF901",
-  "productId":"0xF902",
+  "productId":"0xFF02",
   "lighting": "qmk_rgblight",
   "matrix": { "rows": 10, "cols": 8 },
   "customKeycodes": [

@@ -19,6 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MASTER_LEFT
 
+#undef PRODUCT_ID
+#define PRODUCT_ID      0xFF02 //Original was 0xF902. If the same ID is used, VIA will fail to reload saved layouts.
+
 #undef MATRIX_ROWS
 #undef MATRIX_COLS
 #undef MATRIX_ROW_PINS
