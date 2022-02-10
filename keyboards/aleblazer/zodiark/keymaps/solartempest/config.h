@@ -75,3 +75,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef VIA_ENABLE
 	#define DYNAMIC_KEYMAP_LAYER_COUNT 5
 #endif
+
+#define D2SKATE_MACRO_ENABLE	//Enable Destiny 2 hunter skate macro (+224)

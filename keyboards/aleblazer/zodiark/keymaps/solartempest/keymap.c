@@ -161,9 +161,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 		if (trackball_is_scrolling) {
 			mouse_report.h = mouse_report.x;
 			#ifndef PIMORONI_TRACKBALL_INVERT_X
-				mouse_report.v = 0.3*mouse_report.y;	//Multiplier to lower scrolling sensitivity
+				mouse_report.v = 0.2*mouse_report.y;	//Multiplier to lower scrolling sensitivity
 			#else
-				mouse_report.v = 0.3*-mouse_report.y;	//invert vertical scroll direction
+				mouse_report.v = 0.2*-mouse_report.y;	//invert vertical scroll direction
 			#endif
 			mouse_report.x = mouse_report.y = 0;
 		}
@@ -184,6 +184,41 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 		pointing_device_set_report(currentReport);
 	}
 #endif
+
+
+
+void matrix_scan_user(void) {
+	#ifdef ENCODER_ENABLE
+		encoder_action_unregister(); 
+	#endif
+	
+	#ifdef SUPER_ALT_TAB_ENABLE
+		if (is_alt_tab_active) {	//Allows for use of super alt tab.
+			if (timer_elapsed(alt_tab_timer) > 1000) {
+				unregister_code(KC_LALT);
+				is_alt_tab_active = false;
+			}
+		}
+	#endif
+	#ifdef D2SKATE_MACRO_ENABLE
+		if (D2SKATE_reset == false) {	//Check if Destiny 2 skate timer is activated
+			if (timer_elapsed(D2SKATE_TIMER) > 4000) {
+				rgblight_sethsv_noeeprom(252,255,80); //Set regular game layer colour
+				D2SKATE_reset = true;
+				#ifdef HAPTIC_ENABLE
+					DRV_pulse(12);		//trp_click
+				#endif
+			}
+		}
+	#endif
+	#ifdef ENCODER_ENABLE
+		encoder_action_unregister();
+	#endif
+	if (timer_elapsed32(oled_timer) > 60000) { //60000ms = 60s
+		pimoroni_trackball_set_rgbw(0,0,0, 0x00); //Turn off Pimoroni trackball LED when computer is idle for 1 minute. Would use suspend_power_down_user but the code is not working.
+	}
+}
+
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 	#if defined(KEYBOARD_PET) || defined(OLED_LOGO)
