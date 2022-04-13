@@ -132,7 +132,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 #ifdef POINTING_DEVICE_ENABLE
 	void run_trackball_cleanup(void) {	//Set colour of trackball LED. Does not require RGBLIGHT_ENABLE if colour shorthands are not used.
-		#ifdef POINTING_DEVICE_ENABLE
 		if (trackball_is_scrolling) {
 			pimoroni_trackball_set_rgbw(217, 165, 33, 0x00);	//RGB_GOLDENROD in number form. 
 			//pimoroni_trackball_set_rgbw(43, 153, 103, 0x00);
@@ -142,7 +141,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 			//pimoroni_trackball_set_rgbw(217, 165, 33, 0x00);	//RGB_GOLDENROD in number form.
 			pimoroni_trackball_set_rgbw(43, 153, 103, 0x00);
 		}
-		#endif
 	}
 	
 	uint8_t pointing_device_handle_buttons(uint8_t buttons, bool pressed, pointing_device_buttons_t button) {
@@ -214,9 +212,12 @@ void matrix_scan_user(void) {
 	#ifdef ENCODER_ENABLE
 		encoder_action_unregister();
 	#endif
-	if (timer_elapsed32(oled_timer) > 60000) { //60000ms = 60s
-		pimoroni_trackball_set_rgbw(0,0,0, 0x00); //Turn off Pimoroni trackball LED when computer is idle for 1 minute. Would use suspend_power_down_user but the code is not working.
-	}
+	
+	#ifdef POINTING_DEVICE_ENABLE
+		if (timer_elapsed32(oled_timer) > 60000) { //60000ms = 60s
+			pimoroni_trackball_set_rgbw(0,0,0, 0x00); //Turn off Pimoroni trackball LED when computer is idle for 1 minute. Would use suspend_power_down_user but the code is not working.
+		}
+	#endif
 }
 
 
@@ -508,6 +509,7 @@ void keyboard_post_init_user(void)
 {
 	#ifdef RGBLIGHT_ENABLE
 		rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_GRADIENT+8); //Set to static gradient 9
+		//rgblight_mode_noeeprom(RGBLIGHT_MODE_BREATHING); //Test
 	#endif
 	layer_move(0); 						//Start on layer0 by default to set LED colours. Can remove to save a very small amount of space.
 	#ifdef POINTING_DEVICE_ENABLE

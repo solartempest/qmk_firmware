@@ -60,6 +60,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef RGBLIGHT_ENABLE
 	#undef RGBLIGHT_ANIMATIONS // Very memory intensive (+2604)
 	#define RGBLIGHT_EFFECT_STATIC_GRADIENT //Preferred RGB effect (+262)
+	//#define RGBLIGHT_EFFECT_BREATHING  //Testing
 	//#define RGBLIGHT_EFFECT_SNAKE //For testing LED order
 	#define RGBLIGHT_SLEEP //Turn off LEDs when computer sleeping (+72)
 #endif

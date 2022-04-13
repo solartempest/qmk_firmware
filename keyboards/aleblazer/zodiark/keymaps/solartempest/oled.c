@@ -13,6 +13,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifdef OLED_ENABLE
+uint32_t oled_timer = 0; //OLED timeout
+led_t led_usb_state;
 
 static void render_logo(void) {
     static const char PROGMEM qmk_logo[] = {
@@ -61,10 +63,12 @@ static void print_status_narrow(void) {
 }
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
-    if (is_keyboard_master()) {
-        return OLED_ROTATION_90;
-    }
-    return rotation;
+	if (is_keyboard_master()) {
+		return OLED_ROTATION_90;
+	}
+	else{
+		return OLED_ROTATION_270;
+	}
 }
 
 bool oled_task_user(void) {
