@@ -216,9 +216,11 @@ void matrix_scan_user(void) {
 	#ifdef ENCODER_ENABLE
 		encoder_action_unregister();
 	#endif
+    #ifdef POINTING_DEVICE_ENABLE
 	if (timer_elapsed32(oled_timer) > 60000) { //60000ms = 60s
 		pimoroni_trackball_set_rgbw(0,0,0, 0x00); //Turn off Pimoroni trackball LED when computer is idle for 1 minute. Would use suspend_power_down_user but the code is not working.
 	}
+    #endif
 }
 
 
