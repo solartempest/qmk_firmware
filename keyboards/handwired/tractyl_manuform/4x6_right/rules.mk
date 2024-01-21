@@ -1,9 +1,3 @@
-# MCU name
-MCU = at90usb1286
-
-# Bootloader selection
-BOOTLOADER = atmel-dfu
-
 # Build Options
 #   change yes to no to disable
 #
@@ -17,13 +11,9 @@ BACKLIGHT_ENABLE = no       # Enable keyboard backlight functionality
 RGBLIGHT_ENABLE = no        # Enable keyboard RGB underglow
 AUDIO_ENABLE = no           # Audio output
 RGB_MATRIX_ENABLE = no
-RGB_MATRIX_DRIVER = WS2812
-
 
 POINTING_DEVICE_ENABLE = yes
-MOUSE_SHARED_EP = no
+POINTING_DEVICE_DRIVER = pmw3360
+MOUSE_SHARED_EP = yes
 
 SPLIT_KEYBOARD = yes
-
-SRC += drivers/sensors/pmw3360.c
-QUANTUM_LIB_SRC += spi_master.c tm_sync.c

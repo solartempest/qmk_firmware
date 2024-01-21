@@ -33,19 +33,19 @@
 #endif
 
 #ifndef WS2812_T1H
-#    define WS2812_T1H 900  // Width of a 1 bit in ns
+#    define WS2812_T1H 900 // Width of a 1 bit in ns
 #endif
 
 #ifndef WS2812_T1L
-#    define WS2812_T1L (WS2812_TIMING - WS2812_T1H)  // Width of a 1 bit in ns
+#    define WS2812_T1L (WS2812_TIMING - WS2812_T1H) // Width of a 1 bit in ns
 #endif
 
 #ifndef WS2812_T0H
-#    define WS2812_T0H 350  // Width of a 0 bit in ns
+#    define WS2812_T0H 350 // Width of a 0 bit in ns
 #endif
 
 #ifndef WS2812_T0L
-#    define WS2812_T0L (WS2812_TIMING - WS2812_T0H)  // Width of a 0 bit in ns
+#    define WS2812_T0L (WS2812_TIMING - WS2812_T0H) // Width of a 0 bit in ns
 #endif
 
 /*
@@ -54,6 +54,12 @@
  */
 #if !defined(WS2812_TRST_US)
 #    define WS2812_TRST_US 280
+#endif
+
+#if defined(RGBLED_NUM)
+#    define WS2812_LED_COUNT RGBLED_NUM
+#elif defined(RGB_MATRIX_LED_COUNT)
+#    define WS2812_LED_COUNT RGB_MATRIX_LED_COUNT
 #endif
 
 /* User Interface
@@ -67,4 +73,4 @@
  *         - Send out the LED data
  *         - Wait 50us to reset the LEDs
  */
-void ws2812_setleds(LED_TYPE *ledarray, uint16_t number_of_leds);
+void ws2812_setleds(rgb_led_t *ledarray, uint16_t number_of_leds);

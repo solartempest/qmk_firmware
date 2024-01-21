@@ -10,6 +10,9 @@ MCU_LDSCRIPT = noah_boot
 #  or <this_dir>/boards
 BOARD = ST_NUCLEO64_F411RE
 
+# Bootloader selection
+BOOTLOADER = custom
+
 # Build Options
 #   change yes to no to disable
 #
@@ -22,13 +25,10 @@ NKRO_ENABLE = no            # Enable N-Key Rollover
 NO_USB_STARTUP_CHECK = yes	# Disable initialization only when usb is plugged in
 
 RGB_MATRIX_ENABLE = yes
-RGB_MATRIX_DRIVER = IS31FL3731
 
 RGBLIGHT_ENABLE = yes
-RGBLIGHT_CUSTOM_DRIVER = yes
+WS2812_DRIVER_REQUIRED = yes
 
 CUSTOM_MATRIX = yes
 # project specific files
-SRC += ws2812.c matrix.c
-
-LAYOUTS = 65_iso_blocker
+SRC += matrix.c

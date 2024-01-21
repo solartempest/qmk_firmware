@@ -5,6 +5,9 @@ MCU = STM32F103
 MCU_LDSCRIPT = wm1_f103
 BOARD = STM32_F103_STM32DUINO
 
+# Bootloader selection
+BOOTLOADER = custom
+
 PROGRAM_CMD = echo 'CLI flashing not supported' >&2
 
 # Build Options
@@ -22,5 +25,3 @@ AUDIO_ENABLE = no           # Audio output
 SLEEP_LED_ENABLE = yes
 LTO_ENABLE = yes
 
-# Enter lower-power sleep mode when on the ChibiOS idle thread
-OPT_DEFS += -DCORTEX_ENABLE_WFI_IDLE=TRUE

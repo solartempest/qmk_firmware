@@ -1,18 +1,16 @@
-MCU = atmega32u4
-
-BOOTLOADER = atmel-dfu
-
-CUSTOM_MATRIX    = yes
-MOUSEKEY_ENABLE  = yes  # Mouse keys
-COMBO_ENABLE     = yes
-EXTRAKEY_ENABLE  = yes
-CONSOLE_ENABLE   = no
-NKRO_ENABLE = yes           # Enable N-Key Rollover
-COMMAND_ENABLE   = yes
+# Build Options
+#   change yes to no to disable
+#
 BOOTMAGIC_ENABLE = yes      # Enable Bootmagic Lite
+MOUSEKEY_ENABLE = yes       # Mouse keys
+EXTRAKEY_ENABLE = yes       # Audio control and System control
+CONSOLE_ENABLE = no         # Console for debug
+COMMAND_ENABLE = yes        # Commands for debug and configuration
+NKRO_ENABLE = yes           # Enable N-Key Rollover
+BACKLIGHT_ENABLE = no       # Enable keyboard backlight functionality
+RGBLIGHT_ENABLE = no        # Enable keyboard RGB underglow
+AUDIO_ENABLE = no           # Audio output
+CUSTOM_MATRIX = yes
 
-LAYOUTS = split_3x5_3
-
-DEBOUNCE_TYPE = sym_eager_pr
 SRC += matrix.c
-QUANTUM_LIB_SRC += i2c_master.c
+I2C_DRIVER_REQUIRED = yes

@@ -1,6 +1,3 @@
-# MCU name
-MCU = STM32F401
-
 # Build Options
 #   change yes to no to disable
 #
@@ -13,7 +10,3 @@ NKRO_ENABLE = no            # Enable N-Key Rollover
 BACKLIGHT_ENABLE = no      # Enable keyboard backlight functionality
 RGBLIGHT_ENABLE = no        # Enable keyboard RGB underglow
 AUDIO_ENABLE = no           # Audio output
-EEPROM_DRIVER = i2c
-# Enter lower-power sleep mode when on the ChibiOS idle thread
-OPT_DEFS += -DCORTEX_ENABLE_WFI_IDLE=TRUE -DDEBUG_EEPROM_OUTPUT=TRUE
-STM32_BOOTLOADER_ADDRESS = 0x1FFF0000

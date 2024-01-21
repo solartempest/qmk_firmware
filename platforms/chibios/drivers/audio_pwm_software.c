@@ -25,8 +25,7 @@ this driver uses the chibios-PWM system to produce a square-wave on any given ou
 
  */
 #include "audio.h"
-#include "ch.h"
-#include "hal.h"
+#include "gpio.h"
 
 #if !defined(AUDIO_PIN)
 #    error "Audio feature enabled, but no pin selected - see docs/feature_audio under the ARM PWM settings"
@@ -57,7 +56,7 @@ static float channel_1_frequency = 0.0f;
 void         channel_1_set_frequency(float freq) {
     channel_1_frequency = freq;
 
-    if (freq <= 0.0)  // a pause/rest has freq=0
+    if (freq <= 0.0) // a pause/rest has freq=0
         return;
 
     pwmcnt_t period = (pwmCFG.frequency / freq);
@@ -68,7 +67,9 @@ void         channel_1_set_frequency(float freq) {
                      PWM_PERCENTAGE_TO_WIDTH(&AUDIO_PWM_DRIVER, (100 - note_timbre) * 100));
 }
 
-float channel_1_get_frequency(void) { return channel_1_frequency; }
+float channel_1_get_frequency(void) {
+    return channel_1_frequency;
+}
 
 void channel_1_start(void) {
     pwmStop(&AUDIO_PWM_DRIVER);
@@ -81,10 +82,10 @@ void channel_1_start(void) {
 void channel_1_stop(void) {
     pwmStop(&AUDIO_PWM_DRIVER);
 
-    palClearLine(AUDIO_PIN);  // leave the line low, after last note was played
+    palClearLine(AUDIO_PIN); // leave the line low, after last note was played
 
 #if defined(AUDIO_PIN_ALT) && defined(AUDIO_PIN_ALT_AS_NEGATIVE)
-    palClearLine(AUDIO_PIN_ALT);  // leave the line low, after last note was played
+    palClearLine(AUDIO_PIN_ALT); // leave the line low, after last note was played
 #endif
 }
 
@@ -100,7 +101,7 @@ static void pwm_audio_period_callback(PWMDriver *pwmp) {
 static void pwm_audio_channel_interrupt_callback(PWMDriver *pwmp) {
     (void)pwmp;
     if (channel_1_frequency > 0) {
-        palSetLine(AUDIO_PIN);  // generate a PWM signal on any pin, not necessarily the one connected to the timer
+        palSetLine(AUDIO_PIN); // generate a PWM signal on any pin, not necessarily the one connected to the timer
 #if defined(AUDIO_PIN_ALT) && defined(AUDIO_PIN_ALT_AS_NEGATIVE)
         palClearLine(AUDIO_PIN_ALT);
 #endif
@@ -131,7 +132,7 @@ void audio_driver_initialize(void) {
     palClearLine(AUDIO_PIN_ALT);
 #endif
 
-    pwmEnablePeriodicNotification(&AUDIO_PWM_DRIVER);  // enable pwm callbacks
+    pwmEnablePeriodicNotification(&AUDIO_PWM_DRIVER); // enable pwm callbacks
     pwmEnableChannelNotification(&AUDIO_PWM_DRIVER, AUDIO_PWM_CHANNEL - 1);
 
     gptStart(&AUDIO_STATE_TIMER, &gptCFG);
@@ -155,10 +156,10 @@ void audio_driver_stop(void) {
  * and updates the pwm to output that frequency
  */
 static void gpt_callback(GPTDriver *gptp) {
-    float freq;  // TODO: freq_alt
+    float freq; // TODO: freq_alt
 
     if (audio_update_state()) {
-        freq = audio_get_processed_frequency(0);  // freq_alt would be index=1
+        freq = audio_get_processed_frequency(0); // freq_alt would be index=1
         channel_1_set_frequency(freq);
     }
 }
