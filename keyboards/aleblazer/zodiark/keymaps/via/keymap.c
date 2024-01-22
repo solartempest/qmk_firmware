@@ -12,7 +12,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include QMK_KEYBOARD_H
-#include "oled.c"
+#ifdef OLED_ENABLE
+	#include "oled.c"
+#endif
 #include "encoder.c"
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
