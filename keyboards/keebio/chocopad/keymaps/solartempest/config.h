@@ -5,3 +5,6 @@
 
 #define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_GRADIENT_UP_DOWN
 #define RGB_MATRIX_DEFAULT_SPD 48
+
+#undef PRODUCT_ID
+#define PRODUCT_ID      0x2145	//Give new product ID for importing custom json into remap-keys
