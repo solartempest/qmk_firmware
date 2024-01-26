@@ -78,7 +78,7 @@
 		}
 	#endif
 	
-	#if defined(OLED_LOGO) && !defined(OLED_NO_SLAVE) && !defined(OLED_NO_MASTER)
+	/*#if defined(OLED_LOGO) && !defined(OLED_NO_SLAVE) && !defined(OLED_NO_MASTER)	//skip photo logo (+396)
 		static void render_logo_master(int LUNA_X, int LUNA_Y) {
 			static const char PROGMEM luna_logo[] = { // 'photo-logo', 64x44px
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
@@ -110,7 +110,7 @@
 			oled_set_cursor(LUNA_X,LUNA_Y);
 			oled_write_raw_P(luna_logo, sizeof(luna_logo));
 		}
-	#endif
+	#endif*/
 	 
 	/*// logic
 	static void render_luna(int LUNA_X, int LUNA_Y) {
@@ -283,7 +283,7 @@
 		//render_luna(0,11);
 		/* KEYBOARD PET RENDER END */
 		#ifdef OLED_LOGO
-			render_logo_master(0,11-0); //Not defining this in config.h will save space (+112).
+			//render_logo_master(0,11-0); //Not defining this in config.h will save space (+112).
 		#endif
 	}
 	 

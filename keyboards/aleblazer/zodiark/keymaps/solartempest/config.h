@@ -47,8 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define NO_ACTION_ONESHOT		//Save 244 bytes (-244).
 #define NO_RESET				//Save 40 bytes (-40).
 #define LAYER_STATE_8BIT		//For less than 8 bits worth of layers.
-#undef LOCKING_SUPPORT_ENABLE	//For MX lock keys only.
-#undef LOCKING_RESYNC_ENABLE	//For MX lock keys only.
+
 
 #ifdef OLED_ENABLE
 	#define OLED_DISPLAY_128X64
@@ -59,6 +58,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifdef RGBLIGHT_ENABLE
 	#undef RGBLIGHT_ANIMATIONS // Very memory intensive (+2604)
+	#undef RGBLIGHT_EFFECT_BREATHING
+	#undef RGBLIGHT_EFFECT_RAINBOW_MOOD
+	#undef RGBLIGHT_EFFECT_RAINBOW_SWIRL
+	#undef RGBLIGHT_EFFECT_SNAKE
+	#undef RGBLIGHT_EFFECT_KNIGHT
+	#undef RGBLIGHT_EFFECT_CHRISTMAS
+	#undef RGBLIGHT_EFFECT_RGB_TEST
+	#undef RGBLIGHT_EFFECT_ALTERNATING
+	#undef RGBLIGHT_EFFECT_TWINKLE
 	#define RGBLIGHT_EFFECT_STATIC_GRADIENT //Preferred RGB effect (+262)
 	//#define RGBLIGHT_EFFECT_BREATHING  //Testing
 	//#define RGBLIGHT_EFFECT_SNAKE //For testing LED order
@@ -67,14 +75,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Pimoroni trackball settings
 #ifdef POINTING_DEVICE_ENABLE
-	//#define PIMORONI_TRACKBALL_INTERVAL_MS 6 //Default is 8ms
 	#define POINTING_DEVICE_ROTATION_90
-	#define PIMORONI_TRACKBALL_INVERT_Y
-	#define PIMORONI_TRACKBALL_INVERT_X
+	#define POINTING_DEVICE_INVERT_X
+	#define POINTING_DEVICE_INVERT_Y
+	#define MOUSE_EXTENDED_REPORT
 #endif      
 
 #ifdef VIA_ENABLE
 	#define DYNAMIC_KEYMAP_LAYER_COUNT 5
 #endif
 
-#define D2SKATE_MACRO_ENABLE	//Enable Destiny 2 hunter skate macro (+224)
+//#define D2SKATE_MACRO_ENABLE	//Enable Destiny 2 hunter skate macro (+224)
