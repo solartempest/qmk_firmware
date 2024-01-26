@@ -1,6 +1,6 @@
 RGBLIGHT_ENABLE = yes
 VIA_ENABLE = yes
-#ENCODER_MAP_ENABLE = yes
+ENCODER_MAP_ENABLE = yes
 
 BOOTMAGIC_ENABLE = no		# Save space on Bootmagic Lite
 MAGIC_ENABLE = no			# Save space (+562)
