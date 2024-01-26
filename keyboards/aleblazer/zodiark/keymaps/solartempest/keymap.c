@@ -134,10 +134,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	void run_trackball_cleanup(void) {	//Set colour of trackball LED. Does not require RGBLIGHT_ENABLE if colour shorthands are not used.
 		if (trackball_is_scrolling) {
 			pimoroni_trackball_set_rgbw(217, 165, 33, 0x00);	//RGB_GOLDENROD in number form. 
+			pimoroni_trackball_set_cpi(3000);	//Use single scrolling speed
 		} else if (!trackball_is_precision) {
 			pimoroni_trackball_set_rgbw(0, 27, 199, 0x00);
+			pimoroni_trackball_set_cpi(30000);
 		} else {
 			pimoroni_trackball_set_rgbw(43, 153, 103, 0x00);
+			pimoroni_trackball_set_cpi(12000);
 		}
 	}
 	
@@ -157,9 +160,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 		if (trackball_is_scrolling) {
 			mouse_report.h = mouse_report.x;
 			#ifndef POINTING_DEVICE_INVERT_X
-				mouse_report.v = 0.1*mouse_report.y;	//Multiplier to lower scrolling sensitivity (was at 0.2)
+				mouse_report.v = 1*mouse_report.y;	//Multiplier to lower scrolling sensitivity (0.1 vs 1)
 			#else
-				mouse_report.v = 0.1*-mouse_report.y;	//invert vertical scroll direction
+				mouse_report.v = 1*-mouse_report.y;	//invert vertical scroll direction
 			#endif
 			mouse_report.x = mouse_report.y = 0;
 		}
@@ -212,7 +215,7 @@ void matrix_scan_user(void) {
 		encoder_action_unregister();
 	#endif
 	
-	/*#ifdef POINTING_DEVICE_ENABLE
+	/*#ifdef POINTING_DEVICE_ENABLE	//Code no longer required as RGB sleep seems to work
 		if (timer_elapsed32(oled_timer) > 60000) { //60000ms = 60s
 			pimoroni_trackball_set_rgbw(0,0,0, 0x00); //Turn off Pimoroni trackball LED when computer is idle for 1 minute. Would use suspend_power_down_user but the code is not working.
 		}
@@ -366,10 +369,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 				case PM_PRECISION:
 					if (record->event.pressed) {
 						if (trackball_is_precision){ //Enable toggling for trackball precision
-							pimoroni_trackball_set_cpi(30000);
+							//pimoroni_trackball_set_cpi(30000);	//Set it when running cleanup instead
 							trackball_is_precision=false;
 						} else{
-							pimoroni_trackball_set_cpi(15000);
+							//pimoroni_trackball_set_cpi(15000);	//Set it when running cleanup instead
 							trackball_is_precision=true;
 						}
 						run_trackball_cleanup();
@@ -512,13 +515,13 @@ void keyboard_post_init_user(void)
 	#endif
 	layer_move(0); 						//Start on layer0 by default to set LED colours. Can remove to save a very small amount of space.
 	#ifdef POINTING_DEVICE_ENABLE
-		pimoroni_trackball_set_cpi(30000);	//Start trackball with lower precision mode
+		pimoroni_trackball_set_cpi(3000);	//Start trackball with lower precision mode and default scrolling
 		run_trackball_cleanup();
 	#endif
 }
 
 #ifdef POINTING_DEVICE_ENABLE
-	void suspend_power_down_user(void) {	//Believe this code is working now
+	void suspend_power_down_user(void) {	//This code appears to be working now
 			pimoroni_trackball_set_rgbw(0,0,0, 0x00); //Turn off Pimoroni trackball LED when computer is sleeping
 	}
 #endif
