@@ -21,7 +21,7 @@ Build guide is available here: [Zodiark build log/guide](https://www.splitlogic.
 -   Supports Pimoroni Trackball installed on master side.
 -	Default action is scrolling. Hold Raise layer for mouse mode.
 -	Mouse mode and precision mode are toggleable with trackball LED indication.
--	Trackball LED shuts off when computer is sleeping (currently bugged).
+-	Trackball LED shuts off when computer is sleeping.
 -	Clicking and dragging is enabled using mouse keys on keymap.
 
 ### RGB Features:
@@ -32,8 +32,6 @@ Build guide is available here: [Zodiark build log/guide](https://www.splitlogic.
 -   Fully emappable left encoder controls volume up/down/mute. Right encoder left/right arrow keys.
 -   Allows for  live remapping of per-layer rotary encoder functions in VIA.
 -   VIA support included by default.
--   Custom macro key in VIA for Super Alt Tab, which is fully compatible with rotary encoders.
--   Custom macro key in VIA for moving windows to other monitors in Windows, which is fully compatible with rotary encoders.
 
 ### Haptic Feedback Features:
 -   Supports Pimoroni Haptic Bzzz installed on master side.
@@ -47,7 +45,6 @@ Build guide is available here: [Zodiark build log/guide](https://www.splitlogic.
 
 ### Acknowledgements
 -   Thanks Aleblazer for creating this great keyboard! Also thanks for sharing the VIA json which made addition of the rotary encoders in VIA much faster.
--   Thanks Drashna for the OLED timeout and extensible rotary encoder code.
 -	Thanks Dasky for helping me resolve prior trackball code issues.
 -	Thanks to Hellsingcoder for creating Luna and Jackasaur for optimizing the code for less space. This was the base code I used for my pixel art.
 

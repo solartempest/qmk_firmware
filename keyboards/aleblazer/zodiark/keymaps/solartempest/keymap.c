@@ -14,9 +14,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include QMK_KEYBOARD_H
 #ifdef OLED_ENABLE
-	#include "snake_photo.c"
+	#include "snake_octi.c"
 #endif
-#include "encoder.c"
 
 #ifdef POINTING_DEVICE_ENABLE
 	bool trackball_is_scrolling = true;		//Default mode is scrolling
@@ -33,43 +32,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 //Variables for custom keycodes
-#ifdef SUPER_ALT_TAB_ENABLE
-	bool is_alt_tab_active = false; // Super Alt Tab Code
-	uint16_t alt_tab_timer = 0;
-#endif
 bool lshift_held = false;	// LShift Backspace Delete whole Word Code
 bool rshift_held = false;	// RShift Backspace Delete whole Word Code
 static uint16_t held_shift = 0;
 
-/*#ifdef D2SKATE_MACRO_ENABLE
-	uint16_t D2SKATE_TIMER = 0;
-	bool D2SKATE_skated = false;	//Has skated
-	bool D2SKATE_reset = true;	//Has skated
-#endif*/
-
-#ifdef VIA_ENABLE
-	enum custom_keycodes { //Use USER 00 instead of SAFE_RANGE for Via. VIA json must include the custom keycode.
-	  ATABF = QK_KB_0, 	//Alt tab forwards
-	  ATABR, 			//Alt tab reverse
-	  NMR, 				//Move window to monitor on right
-	  NML, 				//Move window to monitor on left
-	  SBS, 				//Shift backspace to delete whole word (Swap KC_BPSC with this)
-      PM_SCROLL,		//Toggle trackball scrolling mode
-      PM_PRECISION		//Toggle trackball precision mode
-	  //D2SKATE			//Destiny 2 hunter sword skate
-	};
-#else
-	enum custom_keycodes { //Use USER 00 instead of SAFE_RANGE for Via. VIA json must include the custom keycode.
-	  ATABF = SAFE_RANGE, //Alt tab forwards
-	  ATABR, 			//Alt tab reverse
-	  NMR, 				//Move window to monitor on right
-	  NML, 				//Move window to monitor on left
-	  SBS,				//Shift backspace to delete whole word (Swap KC_BPSC with this)
-      PM_SCROLL,		//Toggle trackball scrolling mode
-      PM_PRECISION		//Toggle trackball precision mode
-	  //D2SKATE			//Destiny 2 hunter sword skate
-	};
-#endif
+enum custom_keycodes { //Use USER 00 instead of SAFE_RANGE for Via. VIA json must include the custom keycode.
+  SBS = QK_KB_0, 				//Shift backspace to delete whole word (Swap KC_BPSC with this)
+  PM_SCROLL,		//Toggle trackball scrolling mode
+  PM_PRECISION		//Toggle trackball precision mode
+};
 
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -90,37 +61,37 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       ),
 	  
 	[2] = LAYOUT(
-      _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                           KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10,  KC_F11,
-      KC_PSLS, KC_P7, KC_P8, KC_P9, KC_NUM,  _______, _______,                    _______, _______, KC_PSLS, KC_P7, KC_P8, KC_P9, KC_F12,
-      KC_CAPS, KC_P4, KC_P5, KC_P6, KC_NUM,  _______, _______,                    _______, _______, _______, KC_P4, KC_P5, KC_P6, KC_NUM,
-      _______, KC_P1, KC_P2, KC_P3, _______, _______, _______, _______,  _______, _______, _______, _______, KC_P1, KC_P2, KC_P3, _______,
-      _______, KC_P0, KC_PDOT, KC_PENT, _______,    _______,   _______,  _______,    _______,    _______, KC_P0, KC_PDOT, KC_PENT, _______
+      _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                              KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10,  KC_F11,
+      _______, _______, _______, _______, _______, _______, _______,                   _______, _______, EE_CLR,  _______, _______, _______, KC_F12,
+      _______, _______, _______, _______, _______, _______, _______,                   _______, _______, RGB_TOG, _______, _______, _______, _______,
+      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, RGB_MOD, RGB_SPI, RGB_HUI, RGB_SAI, RGB_VAI,
+      _______, _______, _______, _______, _______,      _______,     _______, _______,     _______,      RGB_RMOD, RGB_SPD, RGB_HUD, RGB_SAD, RGB_VAD
       ),
 
 	[3] = LAYOUT(
-      _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                              KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10,  KC_F11,
-      _______, _______, _______, _______, _______, _______, _______,                   _______, _______, EE_CLR,  _______, _______, _______, KC_F12,
-      _______, _______, _______, _______, _______, _______, _______,                   _______, _______, RGB_TOG, _______, _______, _______, _______,
-      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, RGB_MOD, RGB_SPI, RGB_HUI, RGB_SAI, RGB_VAI,
-      _______, _______, _______, _______, _______,      _______,     _______, _______,     _______,      RGB_RMOD, RGB_SPD, RGB_HUD, RGB_SAD, RGB_VAD
+      _______, _______, _______, _______, _______, _______,                            _______, _______, _______, _______, _______, _______,
+      _______, _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______, _______,
+      _______, _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______, _______,
+      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+      _______, _______, _______, _______, _______,      _______,     _______, _______,     _______,      _______, _______, _______, _______, _______
       ),
 
 	[4] = LAYOUT(
-      _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                              KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10,  KC_F11,
-      _______, _______, _______, _______, _______, _______, _______,                   _______, _______, EE_CLR,  _______, _______, _______, KC_F12,
-      _______, _______, _______, _______, _______, _______, _______,                   _______, _______, RGB_TOG, _______, _______, _______, _______,
-      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, RGB_MOD, RGB_SPI, RGB_HUI, RGB_SAI, RGB_VAI,
-      _______, _______, _______, _______, _______,      _______,     _______, _______,     _______,      RGB_RMOD, RGB_SPD, RGB_HUD, RGB_SAD, RGB_VAD
+      _______, _______, _______, _______, _______, _______,                            _______, _______, _______, _______, _______, _______,
+      _______, _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______, _______,
+      _______, _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______, _______,
+      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+      _______, _______, _______, _______, _______,      _______,     _______, _______,     _______,      _______, _______, _______, _______, _______
       )
 };
 
 #ifdef ENCODER_MAP_ENABLE
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
     [0] =   { ENCODER_CCW_CW(KC_VOLD, KC_VOLU),  ENCODER_CCW_CW(KC_PGDN, KC_PGUP)  },
-    [1] =   { ENCODER_CCW_CW(_______, _______), ENCODER_CCW_CW(_______, _______)  },
-    [2] =   { ENCODER_CCW_CW(_______, _______), ENCODER_CCW_CW(_______, _______)  },
-    [3] =   { ENCODER_CCW_CW(_______, _______), ENCODER_CCW_CW(_______, _______)  },
-    [4] =   { ENCODER_CCW_CW(_______, _______), ENCODER_CCW_CW(_______, _______)  }
+    [1] =   { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
+    [2] =   { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
+    [3] =   { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
+    [4] =   { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  }
 };
 #endif
 
@@ -154,7 +125,7 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
 		if (trackball_is_scrolling) {
 			mouse_report.h = mouse_report.x;
 			#ifndef POINTING_DEVICE_INVERT_X
-				mouse_report.v = 1*mouse_report.y;	//Multiplier to lower scrolling sensitivity (0.1 vs 1)
+				mouse_report.v = 1*mouse_report.y;	//Multiplier to lower scrolling sensitivity (0.1 can be used instead of 1)
 			#else
 				mouse_report.v = 1*-mouse_report.y;	//invert vertical scroll direction
 			#endif
@@ -180,43 +151,6 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
 #endif
 
 
-
-void matrix_scan_user(void) {
-	#ifdef ENCODER_ENABLE
-		encoder_action_unregister(); 
-	#endif
-	
-	#ifdef SUPER_ALT_TAB_ENABLE
-		if (is_alt_tab_active) {	//Allows for use of super alt tab.
-			if (timer_elapsed(alt_tab_timer) > 1000) {
-				unregister_code(KC_LALT);
-				is_alt_tab_active = false;
-			}
-		}
-	#endif
-	/*#ifdef D2SKATE_MACRO_ENABLE
-		if (D2SKATE_reset == false) {	//Check if Destiny 2 skate timer is activated
-			if (timer_elapsed(D2SKATE_TIMER) > 4000) {
-				rgblight_sethsv_noeeprom(252,255,80); //Set regular game layer colour
-				D2SKATE_reset = true;
-				#ifdef HAPTIC_ENABLE
-					DRV_pulse(12);		//trp_click
-				#endif
-			}
-		}
-	#endif*/
-	#ifdef ENCODER_ENABLE
-		encoder_action_unregister();
-	#endif
-	
-	/*#ifdef POINTING_DEVICE_ENABLE	//Code no longer required as RGB sleep seems to work
-		if (timer_elapsed32(oled_timer) > 60000) { //60000ms = 60s
-			pimoroni_trackball_set_rgbw(0,0,0, 0x00); //Turn off Pimoroni trackball LED when computer is idle for 1 minute. Would use suspend_power_down_user but the code is not working.
-		}
-	#endif*/
-}
-
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 	#if defined(KEYBOARD_PET) || defined(OLED_LOGO)
 		if (record->event.pressed) { //OLED timeout code
@@ -225,56 +159,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 	#endif
 	
 	switch (keycode) { //For keycode overrides
-		#ifdef SUPER_ALT_TAB_ENABLE
-		case ATABF:	//Alt tab forwards
-			if (record->event.pressed) {
-				if (!is_alt_tab_active) {
-					is_alt_tab_active = true;
-					register_code(KC_LALT);
-				}
-					alt_tab_timer = timer_read();
-					register_code(KC_TAB);
-				} else {
-					unregister_code(KC_TAB);
-				}
-			return true;
-		case ATABR:	//Alt tab reverse
-			if (record->event.pressed) {
-				if (!is_alt_tab_active) {
-					is_alt_tab_active = true;
-					register_code(KC_LALT);
-				}
-					alt_tab_timer = timer_read();
-					register_code(KC_LSHIFT);
-					register_code(KC_TAB);
-				} else {
-					unregister_code(KC_LSHIFT);
-					unregister_code(KC_TAB);
-				}
-			return true;
-		#endif
-		  
-		case NMR:	//Move window to next monitor on right
-		  if (record->event.pressed) {
-			register_code(KC_LSFT);
-			register_code(KC_LWIN);
-			register_code(KC_RIGHT);
-			unregister_code(KC_RIGHT);
-			unregister_code(KC_LWIN);
-			unregister_code(KC_LSFT);
-		  }
-		  return true;
-		case NML:	//Move window to next monitor on left
-		  if (record->event.pressed) {
-			register_code(KC_LSFT);
-			register_code(KC_LWIN);
-			register_code(KC_LEFT);
-			unregister_code(KC_LEFT);
-			unregister_code(KC_LWIN);
-			unregister_code(KC_LSFT);
-		  }
-		  return true;
-
 		case KC_RSFT: //Shift Backspace to Delete Whole Word. Inspired by Hellsingcoder.
 			rshift_held = record->event.pressed;
 			held_shift = keycode;
@@ -319,33 +203,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 				}
 			}
 			return false;
-		/*#ifdef D2SKATE_MACRO_ENABLE
-			case D2SKATE:
-					if (record->event.pressed) {
-						register_code(KC_0);
-						wait_ms(34);
-						register_code(KC_SPC);
-						unregister_code(KC_0);
-						register_code(KC_X);
-						wait_ms(18);
-						unregister_code(KC_SPC);
-						unregister_code(KC_X);
-						rgblight_sethsv_noeeprom(180,255,80);
-						D2SKATE_skated = true;
-					}
-				return false;
-			case KC_1:
-			case KC_2:
-			case KC_3:
-				if (record->event.pressed) {
-					if(D2SKATE_skated){	//Start the cooldown timer
-						D2SKATE_TIMER = timer_read();
-						D2SKATE_skated = false;
-						D2SKATE_reset = false;
-					}
-				}
-				return true;
-		#endif*/
 
 		#ifdef POINTING_DEVICE_ENABLE //Allow modes when trackball is enabled.
 				case PM_SCROLL:
@@ -515,7 +372,7 @@ void keyboard_post_init_user(void)
 }
 
 #ifdef POINTING_DEVICE_ENABLE
-	void suspend_power_down_user(void) {	//This code appears to be working now
+	void suspend_power_down_user(void) {
 			pimoroni_trackball_set_rgbw(0,0,0, 0x00); //Turn off Pimoroni trackball LED when computer is sleeping
 	}
 #endif
