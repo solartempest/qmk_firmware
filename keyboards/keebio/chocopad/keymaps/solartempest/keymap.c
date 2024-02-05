@@ -12,6 +12,18 @@ enum custom_keycodes { //Use Remap-Keys to load custom json
   SPAMARROW = QK_KB_0,
 };
 
+const uint16_t PROGMEM divide_combo[] = {KC_P4, KC_P5, COMBO_END};
+const uint16_t PROGMEM multiply_combo[] = {KC_P8, KC_P9, COMBO_END};
+const uint16_t PROGMEM plus_combo[] = {KC_P5, KC_P6, COMBO_END};
+const uint16_t PROGMEM del_combo[] = {KC_BSPC, KC_P9, COMBO_END};
+const uint16_t PROGMEM f2_combo[] = {KC_P7, KC_P8, COMBO_END};
+combo_t key_combos[] = {
+    COMBO(divide_combo, KC_PSLS),
+    COMBO(multiply_combo, KC_PAST),
+    COMBO(plus_combo, KC_PPLS),
+    COMBO(del_combo, KC_DEL),
+    COMBO(f2_combo, KC_F2),
+};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
