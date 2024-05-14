@@ -46,7 +46,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
 	if (layer_state_cmp(layer_state, 1)) {
         hsv = (HSV){HSV_CHARTREUSE};
 	} else if (layer_state_cmp(layer_state, 2)) {
-        hsv = (HSV){HSV_CYAN};
+        hsv = (HSV){HSV_BLUE};
 	} else if (layer_state_cmp(layer_state, 3)) {
         hsv = (HSV){HSV_MAGENTA};
     } else {
