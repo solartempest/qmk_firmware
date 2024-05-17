@@ -13,17 +13,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include QMK_KEYBOARD_H
-<<<<<<< HEAD
-=======
-uint8_t led_min = 0;
-uint8_t led_max = RGB_MATRIX_LED_COUNT;
-
-/*const uint16_t PROGMEM enter_combo[] = {KC_LEFT_BRACKET, KC_RIGHT_BRACKET, COMBO_END};
-combo_t key_combos[] = {
-    COMBO(enter_combo, KC_ENTER),
-};*/
-
->>>>>>> zodiarkpi
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 	[0] = LAYOUT(
@@ -59,27 +48,3 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       )
 
 };
-<<<<<<< HEAD
-=======
-
-
-bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-    for (uint8_t i = led_min; i < led_max; i++) {
-        switch(get_highest_layer(layer_state|default_layer_state)) {
-            case 3:
-                rgb_matrix_set_color(i, 138,0,147);
-                break;
-            case 2:
-                rgb_matrix_set_color(i, RGB_BLUE);
-                break;
-            case 1:
-                rgb_matrix_set_color(i, 0,184,103);
-                break;
-            default:
-                break;
-        }
-    }
-    return false;
-}
-
->>>>>>> zodiarkpi

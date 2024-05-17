@@ -1,0 +1,56 @@
+{
+  "name": "PS17" ,
+  "vendorId": "0x414B",
+  "productId": "0x0015",
+  "lighting": "qmk_rgblight",
+  "matrix": { "rows": 6, "cols": 4 },
+  "customKeycodes": [
+    {
+      "name": "Super Alt Tab FWD",
+      "title": "Alt Tab Forwards in Windows",
+      "shortName": "ATABF"
+    },
+    {
+      "name": "Super Alt Tab REV",
+      "title": "Alt Tab Reverse in Windows",
+      "shortName": "ATABR"
+    },
+    {
+      "name": "Move Window Right",
+      "title": "Move Window Right in Windows",
+      "shortName": "MWR"
+    },
+    {
+      "name": "Move Window Left",
+      "title": "Move Window Left in Windows",
+      "shortName": "MWL"
+    },
+    {
+      "name": "Spam Arrow",
+      "title": "Toggle F24 on interval timer with Orange LED",
+      "shortName": "SA"
+    },
+    {
+      "name": "Teams Muted",
+      "title": "Simply Change LED of 1 to show if muted or not",
+      "shortName": "TM"
+    },
+    {
+      "name": "Stretch Timer",
+      "title": "Activate Stretch Timer",
+      "shortName": "STRT"
+    }
+  ],
+  "layouts": 
+  {
+    "keymap": 
+	 [
+		[{"w": 1, "h":1.5},"0,0", "0,1", {"w": 1, "h":1.5},"0,2"],
+		[{"y":0.75}, "1,0", "1,1", "1,2", "1,3"],
+		[ "2,0", "2,1", "2,2", {"h":2},"2,3"],
+		[ "3,0","3,1","3,2"],
+		[ "4,0", "4,1", "4,2", {"h":2},"4,3"],
+		[{"w": 2},"5,0",  "5,2"]
+	 ]
+  }
+}
