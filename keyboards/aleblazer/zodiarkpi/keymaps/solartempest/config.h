@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Screen support
 #define ST7789_NUM_DEVICES 2
-#define QUANTUM_PAINTER_DISPLAY_TIMEOUT 0
+#define QUANTUM_PAINTER_DISPLAY_TIMEOUT 80000
 #define LCD_RST_PIN GP27
 #define LCD_DC_PIN GP28
 #define LCD_CS_PIN GP11
@@ -36,5 +36,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // #define CIRQUE_PINNACLE_TAPPING_TERM 100
 
 
-// #define SPLIT_LAYER_STATE_ENABLE
 // #define RGB_MATRIX_DEFAULT_FLAGS LED_FLAG_ALL
+// #define RGB_MATRIX_MAXIMUM_BRIGHTNESS 200
+#define RGB_MATRIX_SLEEP
+#define SPLIT_LAYER_STATE_ENABLE
+#define SPLIT_LED_STATE_ENABLE
+#define SPLIT_OLED_ENABLE
+#define SPLIT_ACTIVITY_ENABLE
+
+#define TAP_CODE_DELAY 10
+#define TAPPING_TOGGLE 2 //Tap TT twice to toggle layer
+#define TAPPING_TERM 160 //Tapping duration in ms

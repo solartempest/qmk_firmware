@@ -128,54 +128,14 @@ led_config_t g_led_config = { {
 } };
 #endif
 
-#ifdef ENCODER_ENABLE
-
-bool encoder_update_kb(uint8_t index, bool clockwise) {
-    if (!encoder_update_user(index, clockwise)) {
-      return false; /* Don't process further events if user function exists and returns false */
-    }
-    if (index == 0) { /* First encoder */
-        if (clockwise) {
-            tap_code_delay(KC_VOLD, 10);
-        } else {
-            tap_code_delay(KC_VOLU, 10);
-        }
-    } else if (index == 1) { /* Second encoder */
-        if (clockwise) {
-            rgblight_decrease_val();
-        } else {
-            rgblight_increase_val();
-        }
-
-    } else if (index == 2) { /* Third encoder */
-        if (clockwise) {
-            tap_code(KC_MS_WH_DOWN);
-        } else {
-            tap_code(KC_MS_WH_UP);
-        }
-    } else if (index == 3) { /* Fourth encoder */
-        if (clockwise) {
-            tap_code(KC_MS_WH_RIGHT);
-        } else {
-            tap_code(KC_MS_WH_LEFT);
-        }
-    } else if (index == 4) { /* Fifth encoder */
-        if (clockwise) {
-            tap_code(KC_MS_WH_DOWN);
-        } else {
-            tap_code(KC_MS_WH_UP);
-        }
-    }
-    return true;
-}
-
-#endif
 
 #ifdef QUANTUM_PAINTER_ENABLE
 
-#include "images/ZodiarkPiLogoGC.qgf.c"
-#include "images/ZodiarkPiLogo2Green.qgf.c"
-#include "images/ZodiarkPiLogoSTpink.qgf.c"
+//#include "images/ZodiarkPiLogoGC.qgf.c"
+//#include "images/ZodiarkPiLogo2Green.qgf.c"
+//#include "images/ZodiarkPiLogoSTpink.qgf.c"
+#include "images/haworthia.qgf.c"
+#include "images/jelly2.qgf.c"
 
 static painter_device_t display;
 static painter_image_handle_t image;
@@ -210,11 +170,11 @@ uint32_t deferred_init(uint32_t trigger_time, void *cb_arg) {
         qp_init(display, QP_ROTATION_0);
         }
     if (is_keyboard_left()) {
-        image = qp_load_image_mem(gfx_ZodiarkPiLogoSTpink);
+        image = qp_load_image_mem(gfx_jelly2);
     } 
 // If using pointing device on right side, comment out following 3 lines, if using dual screens, uncomment
     else {
-        image = qp_load_image_mem(gfx_ZodiarkPiLogoSTpink);
+        image = qp_load_image_mem(gfx_haworthia);
     }
     // ##end st7789 screen support
 

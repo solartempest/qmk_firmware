@@ -13,13 +13,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include QMK_KEYBOARD_H
+//#include "image_update.c"
+
+
 uint8_t led_min = 0;
 uint8_t led_max = RGB_MATRIX_LED_COUNT;
 
-/*const uint16_t PROGMEM enter_combo[] = {KC_LEFT_BRACKET, KC_RIGHT_BRACKET, COMBO_END};
+const uint16_t PROGMEM enter_combo[] = {KC_LEFT_BRACKET, KC_RIGHT_BRACKET, COMBO_END};
 combo_t key_combos[] = {
     COMBO(enter_combo, KC_ENTER),
-};*/
+};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -57,8 +60,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
+#ifdef ENCODER_MAP_ENABLE
+const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
+    [0] =   { ENCODER_CCW_CW(KC_VOLD, KC_VOLU),  ENCODER_CCW_CW(KC_PGDN, KC_PGUP)  },
+    [1] =   { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
+    [2] =   { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
+    [3] =   { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  }
+};
+#endif
 
-bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+/*bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     for (uint8_t i = led_min; i < led_max; i++) {
         switch(get_highest_layer(layer_state|default_layer_state)) {
             case 3:
@@ -75,5 +86,48 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         }
     }
     return false;
+}*/
+
+/*bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+	if (layer_state_cmp(layer_state, 1)) {
+	rgb_matrix_sethsv_noeeprom(HSV_SPRINGGREEN);
+	} else if (layer_state_cmp(layer_state, 2)) {
+	rgb_matrix_sethsv_noeeprom(HSV_BLUE);
+	} else if (layer_state_cmp(layer_state, 3)) {
+	rgb_matrix_sethsv_noeeprom(HSV_MAGENTA);
+    } else {
+	rgb_matrix_sethsv_noeeprom(HSV_CHARTREUSE);
+    }
+    return false;
+}*/
+
+bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+    HSV hsv = {HSV_SPRINGGREEN};
+	if (layer_state_cmp(layer_state, 1)) {
+        hsv = (HSV){HSV_CHARTREUSE};
+	} else if (layer_state_cmp(layer_state, 2)) {
+        hsv = (HSV){HSV_BLUE};
+	} else if (layer_state_cmp(layer_state, 3)) {
+        hsv = (HSV){HSV_MAGENTA};
+    } else {
+        hsv = (HSV){HSV_SPRINGGREEN};
+    }
+
+    if (hsv.v > rgb_matrix_get_val()) {
+        hsv.v = rgb_matrix_get_val();
+    }
+    RGB rgb = hsv_to_rgb(hsv);
+
+    for (uint8_t i = led_min; i < led_max; i++) {
+        rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
+    }
+    return false;
 }
 
+void suspend_power_down_user(void) {
+    rgb_matrix_disable_noeeprom();
+}
+
+void suspend_wakeup_init_user(void) {
+    rgb_matrix_enable_noeeprom();
+}
