@@ -46,4 +46,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define TAP_CODE_DELAY 10
 #define TAPPING_TOGGLE 2 //Tap TT twice to toggle layer
-#define TAPPING_TERM 160 //Tapping duration in ms
+#define TAPPING_TERM 140 //Tapping duration in ms
