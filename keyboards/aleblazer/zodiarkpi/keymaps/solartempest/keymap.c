@@ -115,7 +115,33 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     RGB rgb = hsv_to_rgb(hsv);
 
     for (uint8_t i = led_min; i < led_max; i++) {
-        rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
+		if (HAS_FLAGS(g_led_config.flags[i], 0x02)) { // 0x02 == LED_FLAG_UNDERGLOW
+			rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
+		}
+		if (HAS_FLAGS(g_led_config.flags[i], 0x01)) { // 0x01 == LED_FLAG_MODIFIER to change thumb cluster too
+			rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
+		}
+    }
+		/*for (uint8_t i = led_min; i < led_max; i++) {
+			if (HAS_FLAGS(g_led_config.flags[i], 0x04)) { // 0x02 == LED_FLAG_UNDERGLOW
+				rgb_matrix_set_color(i, RGB_RED);
+			}
+			if (HAS_FLAGS(g_led_config.flags[i], 0x08)) { // 0x02 == LED_FLAG_UNDERGLOW
+				rgb_matrix_set_color(i, RGB_PURPLE);
+			}
+		}*/
+	
+	if (host_keyboard_led_state().caps_lock) {
+		rgb_matrix_set_color(6, RGB_GOLDENROD);
+		rgb_matrix_set_color(8, RGB_GOLDENROD);
+    }
+	if (!host_keyboard_led_state().num_lock) {
+		rgb_matrix_set_color(3, RGB_YELLOW);
+		rgb_matrix_set_color(5, RGB_YELLOW);
+    }
+	if (host_keyboard_led_state().scroll_lock) {
+		rgb_matrix_set_color(2, RGB_ORANGE);
+		rgb_matrix_set_color(0, RGB_ORANGE);
     }
     return false;
 }
