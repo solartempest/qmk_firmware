@@ -121,7 +121,7 @@ led_config_t g_led_config = { {
 	{ 220, 56 },
 },
 { // LED Index to Flag
- /*Left Hand*/4, 2, 4, 4, 2, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 2, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 2, 1, 2, 4, 4, 2, 4, 4, 2, 4, /*Right Hand*/4, 2, 4, 4, 2, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 2, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 2, 1, 2, 4, 4, 2, 4, 4, 2, 4,
+ /*Left Hand*/4, 2, 4, 4, 2, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 2, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 2, 1, 2, 4, 4, 2, 4, 4, 2, 4, /*Right Hand*/4, 2, 4, 4, 2, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 2, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 4, 2, 4, 4, 2, 4, 4, 2, 4,
 }
 };
 #endif
@@ -132,9 +132,9 @@ led_config_t g_led_config = { {
 //#include "images/ZodiarkPiLogoGC.qgf.c"
 //#include "images/ZodiarkPiLogo2Green.qgf.c"
 //#include "images/ZodiarkPiLogoSTpink.qgf.c"
-#include "images/haworthia.qgf.c"
 #include "images/jelly.qgf.c"
-#include "images/hunter1.qgf.c"
+//#include "images/trees1.qgf.c"
+#include "images/trees2.qgf.c"
 
 static painter_device_t display;
 static painter_image_handle_t image;
@@ -159,22 +159,23 @@ painter_device_t qp_st7789_make_spi_device(uint16_t panel_width, uint16_t panel_
 uint32_t deferred_init(uint32_t trigger_time, void *cb_arg) {
 // ##st7789 screen support, comment out down to "##end st7789 screen support" if not using a st7789 screen
     display = qp_st7789_make_spi_device(320, 240, LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, LCD_SPI_DIVISOR, 3);
-    if (is_keyboard_left()) {
+    if (!is_keyboard_left()) {
         qp_power(display, true);
         } 
     if (is_keyboard_left()) {
-        qp_init(display, QP_ROTATION_180);
+        //qp_init(display, QP_ROTATION_180);
         } 
 // If using pointing device on right side, comment out following 3 lines, if using dual screens, uncomment.
         else {
         qp_init(display, QP_ROTATION_0);
         }
     if (is_keyboard_left()) {
-        image = qp_load_image_mem(gfx_jelly);
+        //image = qp_load_image_mem(gfx_jelly);
+		//image = qp_load_image_mem(gfx_trees1);
     } 
 // If using pointing device on right side, comment out following 3 lines, if using dual screens, uncomment
     else {
-        image = qp_load_image_mem(gfx_haworthia);
+		image = qp_load_image_mem(gfx_trees2);
     }
     // ##end st7789 screen support
 
@@ -201,7 +202,7 @@ uint32_t deferred_init(uint32_t trigger_time, void *cb_arg) {
     if (image != NULL) {
         //print("image was not null\n");
         if (is_keyboard_left()) {
-            qp_drawimage(display, 0, 0, image);
+            //qp_drawimage(display, 0, 0, image);
         } 
     // If using pointing device on right side, comment out following 3 lines, if using dual screens, uncomment.
         else {
@@ -215,8 +216,9 @@ uint32_t deferred_init(uint32_t trigger_time, void *cb_arg) {
 void keyboard_post_init_kb(void)
 {
     defer_exec(3000, deferred_init, NULL);
-    image_layer_0 = qp_load_image_mem(gfx_jelly);
-    image_layer_1 = qp_load_image_mem(gfx_hunter1);
+    //image_layer_0 = qp_load_image_mem(gfx_jelly);
+	image_layer_1 = qp_load_image_mem(gfx_jelly);
+    image_layer_0 = qp_load_image_mem(gfx_trees2);
 }
 #endif
 
@@ -226,17 +228,21 @@ void update_display_for_layer(uint8_t layer) {
         case 0:
 			if(was_gaming_layer==true){
 				was_gaming_layer=false;
-				if(is_keyboard_left()){qp_drawimage(display,0,0,image_layer_0);}
+				if(!is_keyboard_left()){qp_drawimage(display,0,0,image_layer_0);}
 			}
             break;
         case 1:
 			was_gaming_layer=true;
-			if(is_keyboard_left()) {qp_drawimage(display,0,0,image_layer_1);}
+			if(!is_keyboard_left()) {qp_drawimage(display,0,0,image_layer_1);}
+            break;
+        case 2:
+			if(was_gaming_layer){};
+			//if(!is_keyboard_left()) {qp_drawimage(display,0,0,image_layer_1);}
             break;
         // Add more cases for additional layers
         default:
 			if(was_gaming_layer==true){
-				if(is_keyboard_left()){qp_drawimage(display,0,0,image_layer_0);}
+				if(!is_keyboard_left()){qp_drawimage(display,0,0,image_layer_0);}
 			}
             break;
     }

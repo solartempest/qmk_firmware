@@ -15,7 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 // Screen support
-#define ST7789_NUM_DEVICES 2
+#define ST7789_NUM_DEVICES 1
 #define QUANTUM_PAINTER_DISPLAY_TIMEOUT 80000
 #define LCD_RST_PIN GP27
 #define LCD_DC_PIN GP28
@@ -25,15 +25,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define QUANTUM_PAINTER_SUPPORTS_NATIVE_COLORS true
 
 // Cirque support, comment out if using two screens
-/*#define SPLIT_POINTING_ENABLE
-#define POINTING_DEVICE_RIGHT
+#define SPLIT_POINTING_ENABLE
+//#define POINTING_DEVICE_RIGHT
+#define POINTING_DEVICE_LEFT
+#define POINTING_DEVICE_ROTATION_180
 #define CIRQUE_PINNACLE_POSITION_MODE CIRQUE_PINNACLE_ABSOLUTE_MODE
 #define CIRQUE_PINNACLE_DIAMETER_MM 40
 #define CIRQUE_PINNACLE_CURVED_OVERLAY
 #define POINTING_DEVICE_CS_PIN GP11
 #define CIRQUE_PINNACLE_TAP_ENABLE
 #define POINTING_DEVICE_GESTURES_SCROLL_ENABLE
-#define CIRQUE_PINNACLE_TAPPING_TERM 100*/
+#define CIRQUE_PINNACLE_TAPPING_TERM 100
 
 
 // #define RGB_MATRIX_DEFAULT_FLAGS LED_FLAG_ALL
@@ -46,4 +48,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define TAP_CODE_DELAY 10
 #define TAPPING_TOGGLE 2 //Tap TT twice to toggle layer
-#define TAPPING_TERM 140 //Tapping duration in ms
+#define TAPPING_TERM 100 //Tapping duration in ms, normally using 140
