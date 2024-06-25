@@ -15,10 +15,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include QMK_KEYBOARD_H
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 //#include "image_update.c"
 
+=======
+>>>>>>> zodiarkpi
 
 >>>>>>> zodiarkpi
 uint8_t led_min = 0;
@@ -31,7 +34,6 @@ combo_t key_combos[] = {
 
 >>>>>>> zodiarkpi
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-
 	[0] = LAYOUT(
       KC_ESC,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                           KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_BSPC,
       KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                                           KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSLS,
@@ -63,7 +65,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, RGB_MOD, RGB_SPI, RGB_HUI, RGB_SAI, RGB_VAI,
       _______, _______, _______, _______, _______,      _______,     _______, _______,     _______,      RGB_RMOD, RGB_SPD, RGB_HUD, RGB_SAD, RGB_VAD
       )
-
 };
 <<<<<<< HEAD
 =======
@@ -111,30 +112,61 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     HSV hsv = {HSV_SPRINGGREEN};
-	if (layer_state_cmp(layer_state, 1)) {
-        hsv = (HSV){HSV_CHARTREUSE};
+	if (layer_state_cmp(layer_state, 3)) {
+        hsv = (HSV){HSV_MAGENTA};
 	} else if (layer_state_cmp(layer_state, 2)) {
         hsv = (HSV){HSV_BLUE};
-	} else if (layer_state_cmp(layer_state, 3)) {
-        hsv = (HSV){HSV_MAGENTA};
+	} else if (layer_state_cmp(layer_state, 1)) {
+        hsv = (HSV){HSV_CHARTREUSE};
     } else {
         hsv = (HSV){HSV_SPRINGGREEN};
     }
 
-    if (hsv.v > rgb_matrix_get_val()) {
+    /*if (hsv.v > rgb_matrix_get_val()) { //set current brightness setting for underglow
         hsv.v = rgb_matrix_get_val();
-    }
+    }*/
+    hsv.v = rgb_matrix_get_val()/3; //decrease underglow brightness relative to the rest
     RGB rgb = hsv_to_rgb(hsv);
 
     for (uint8_t i = led_min; i < led_max; i++) {
-        rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
+		if (HAS_FLAGS(g_led_config.flags[i], 0x02)) { // 0x02 == LED_FLAG_UNDERGLOW
+			rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
+		}
+    }
+		/*for (uint8_t i = led_min; i < led_max; i++) {
+			if (HAS_FLAGS(g_led_config.flags[i], 0x04)) { // 0x02 == LED_FLAG_KEYS
+				rgb_matrix_set_color(i, RGB_RED);
+			}
+			if (HAS_FLAGS(g_led_config.flags[i], 0x08)) { // 0x02 == LED_FLAG_MODS?
+				rgb_matrix_set_color(i, RGB_PURPLE);
+			}
+		}*/
+	
+	if (host_keyboard_led_state().caps_lock) {
+		rgb_matrix_set_color(7, RGB_GOLDENROD);
+		//rgb_matrix_set_color(6, RGB_GOLDENROD);
+		//rgb_matrix_set_color(8, RGB_GOLDENROD);
+    }
+	if (!host_keyboard_led_state().num_lock) {
+		rgb_matrix_set_color(4, RGB_GOLDENROD);
+		//rgb_matrix_set_color(3, RGB_YELLOW);
+		//rgb_matrix_set_color(5, RGB_YELLOW);
+    }
+	if (host_keyboard_led_state().scroll_lock) {
+		rgb_matrix_set_color(1, RGB_GOLDENROD);
+		//rgb_matrix_set_color(2, RGB_ORANGE);
+		//rgb_matrix_set_color(0, RGB_ORANGE);
     }
     return false;
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> zodiarkpi
 =======
+=======
+
+>>>>>>> zodiarkpi
 void suspend_power_down_user(void) {
     rgb_matrix_disable_noeeprom();
 }
