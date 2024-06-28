@@ -8,4 +8,3 @@ SPACE_CADET_ENABLE = no 	# Save space by not using space cadet left/right shift 
 LTO_ENABLE = yes			# Save space by link time optimization
 
 UNICODE_ENABLE = yes   	    # Unicode
-COMBO_ENABLE = yes         	# Tap combo chording (+952)

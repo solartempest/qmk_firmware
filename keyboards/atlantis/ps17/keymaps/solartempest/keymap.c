@@ -12,21 +12,6 @@ enum custom_keycodes { //Use Remap-Keys to load custom json
   SPAMARROW = QK_KB_0,
 };
 
-#ifdef COMBO_ENABLE //Tap combos
-	const uint16_t PROGMEM divide_combo[] = {KC_P4, KC_P5, COMBO_END};
-	const uint16_t PROGMEM multiply_combo[] = {KC_P8, KC_P9, COMBO_END};
-	const uint16_t PROGMEM plus_combo[] = {KC_P5, KC_P6, COMBO_END};
-	const uint16_t PROGMEM del_combo[] = {KC_BSPC, KC_P9, COMBO_END};
-	const uint16_t PROGMEM f2_combo[] = {KC_P7, KC_P8, COMBO_END};
-	combo_t key_combos[] = {
-		COMBO(divide_combo, KC_PSLS),
-		COMBO(multiply_combo, KC_PAST),
-		COMBO(plus_combo, KC_PPLS),
-		COMBO(del_combo, KC_DEL),
-		COMBO(f2_combo, KC_F2),
-	};
-#endif
-
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // Default layer: numpad + volume control
     [0] = LAYOUT(
@@ -74,15 +59,15 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
 
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-    HSV hsv = {HSV_SPRINGGREEN};
+      HSV hsv = {HSV_CHARTREUSE};
 	if (layer_state_cmp(layer_state, 1)) {
-        hsv = (HSV){HSV_CHARTREUSE};
+		hsv = (HSV){HSV_SPRINGGREEN};
 	} else if (layer_state_cmp(layer_state, 2)) {
         hsv = (HSV){HSV_BLUE};
 	} else if (layer_state_cmp(layer_state, 3)) {
         hsv = (HSV){HSV_MAGENTA};
     } else {
-        hsv = (HSV){HSV_SPRINGGREEN};
+        hsv = (HSV){HSV_CHARTREUSE};
     }
 
     if (hsv.v > rgb_matrix_get_val()) {	//Limit max brightness of underglow, if desired
