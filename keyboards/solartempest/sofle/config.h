@@ -25,7 +25,6 @@
 #define DEVICE_VER      0x0002
 #define MANUFACTURER    Keyhive
 #define PRODUCT         Solarius_Sofle //New unique name
-#define DESCRIPTION     Rose version of the Sofle
 
 // Set which side is master
 #define MASTER_LEFT
@@ -61,8 +60,6 @@
 #define D2SKATE_MACRO_ENABLE	//Enable Destiny 2 hunter skate macro (+224)
 
 // Disabled to save space
-#define NO_ACTION_MACRO
-#define NO_ACTION_FUNCTION
 #define NO_ACTION_ONESHOT		//Save 244 bytes (-244).
 #define NO_RESET				//Save 40 bytes (-40).
 #define LAYER_STATE_8BIT		//For less than 8 bits worth of layers.
