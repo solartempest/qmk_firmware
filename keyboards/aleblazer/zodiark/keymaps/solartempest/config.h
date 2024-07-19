@@ -37,12 +37,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DEBOUNCE 6 //Default is 5
 
 // Tapping settings
-#define TAP_CODE_DELAY 10
+/*#define TAP_CODE_DELAY 10
 #define TAPPING_TOGGLE 2 //Tap TT twice to toggle layer
-#define TAPPING_TERM 160 //Tapping duration in ms
+#define TAPPING_TERM 160 //Tapping duration in ms*/
 
 // Disabled to save space
-#define NO_ACTION_MACRO
 #define NO_ACTION_FUNCTION
 #define NO_ACTION_ONESHOT		//Save 244 bytes (-244).
 #define NO_RESET				//Save 40 bytes (-40).
@@ -58,7 +57,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 #ifdef RGBLIGHT_ENABLE
-	#undef RGBLIGHT_ANIMATIONS // Very memory intensive (+2604)
 	#define RGBLIGHT_EFFECT_STATIC_GRADIENT //Preferred RGB effect (+262)
 	//#define RGBLIGHT_EFFECT_BREATHING  //Testing
 	//#define RGBLIGHT_EFFECT_SNAKE //For testing LED order
@@ -76,5 +74,3 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef VIA_ENABLE
 	#define DYNAMIC_KEYMAP_LAYER_COUNT 5
 #endif
-
-#define D2SKATE_MACRO_ENABLE	//Enable Destiny 2 hunter skate macro (+224)

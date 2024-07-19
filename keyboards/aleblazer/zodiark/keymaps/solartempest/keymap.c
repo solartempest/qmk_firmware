@@ -41,12 +41,6 @@ bool lshift_held = false;	// LShift Backspace Delete whole Word Code
 bool rshift_held = false;	// RShift Backspace Delete whole Word Code
 static uint16_t held_shift = 0;
 
-#ifdef D2SKATE_MACRO_ENABLE
-	uint16_t D2SKATE_TIMER = 0;
-	bool D2SKATE_skated = false;	//Has skated
-	bool D2SKATE_reset = true;	//Has skated
-#endif
-
 #ifdef VIA_ENABLE
 	enum custom_keycodes { //Use USER 00 instead of SAFE_RANGE for Via. VIA json must include the custom keycode.
 	  ATABF = USER00, 	//Alt tab forwards
@@ -55,8 +49,7 @@ static uint16_t held_shift = 0;
 	  NML, 				//Move window to monitor on left
 	  SBS, 				//Shift backspace to delete whole word (Swap KC_BPSC with this)
       PM_SCROLL,		//Toggle trackball scrolling mode
-      PM_PRECISION,		//Toggle trackball precision mode
-	  D2SKATE			//Destiny 2 hunter sword skate
+      PM_PRECISION		//Toggle trackball precision mode
 	};
 #else
 	enum custom_keycodes { //Use USER 00 instead of SAFE_RANGE for Via. VIA json must include the custom keycode.
@@ -66,8 +59,7 @@ static uint16_t held_shift = 0;
 	  NML, 				//Move window to monitor on left
 	  SBS,				//Shift backspace to delete whole word (Swap KC_BPSC with this)
       PM_SCROLL,		//Toggle trackball scrolling mode
-      PM_PRECISION,		//Toggle trackball precision mode
-	  D2SKATE			//Destiny 2 hunter sword skate
+      PM_PRECISION		//Toggle trackball precision mode
 	};
 #endif
 
@@ -198,17 +190,6 @@ void matrix_scan_user(void) {
 			}
 		}
 	#endif
-	#ifdef D2SKATE_MACRO_ENABLE
-		if (D2SKATE_reset == false) {	//Check if Destiny 2 skate timer is activated
-			if (timer_elapsed(D2SKATE_TIMER) > 4000) {
-				rgblight_sethsv_noeeprom(252,255,80); //Set regular game layer colour
-				D2SKATE_reset = true;
-				#ifdef HAPTIC_ENABLE
-					DRV_pulse(12);		//trp_click
-				#endif
-			}
-		}
-	#endif
 	#ifdef ENCODER_ENABLE
 		encoder_action_unregister();
 	#endif
@@ -323,33 +304,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 				}
 			}
 			return false;
-		#ifdef D2SKATE_MACRO_ENABLE
-			case D2SKATE:
-					if (record->event.pressed) {
-						register_code(KC_0);
-						wait_ms(34);
-						register_code(KC_SPC);
-						unregister_code(KC_0);
-						register_code(KC_X);
-						wait_ms(18);
-						unregister_code(KC_SPC);
-						unregister_code(KC_X);
-						rgblight_sethsv_noeeprom(180,255,80);
-						D2SKATE_skated = true;
-					}
-				return false;
-			case KC_1:
-			case KC_2:
-			case KC_3:
-				if (record->event.pressed) {
-					if(D2SKATE_skated){	//Start the cooldown timer
-						D2SKATE_TIMER = timer_read();
-						D2SKATE_skated = false;
-						D2SKATE_reset = false;
-					}
-				}
-				return true;
-		#endif
 
 		#ifdef POINTING_DEVICE_ENABLE //Allow modes when trackball is enabled.
 				case PM_SCROLL:

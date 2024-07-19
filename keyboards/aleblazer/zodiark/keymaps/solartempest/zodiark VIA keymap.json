@@ -39,11 +39,6 @@
       "name": "Trackball Precision",
       "title": "Pimoroni Trackball Precision Mode",
       "shortName": "PM_PRECISION"
-    },
-    {
-      "name": "D2 Hunter Skate",
-      "title": "Destiny 2 Hunter Sword Skate",
-      "shortName": "D2SKATE"
     }
   ],
   "layouts": 
